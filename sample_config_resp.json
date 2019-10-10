@@ -1,0 +1,18 @@
+{
+    "msg_type" : "PDU_SESS_RSRC_SETUP_RSP",
+    "qos_per_tunn" : { 
+        "1": "101124353", 
+        "2": "10000001", 
+        "3": "5" },
+    "addn_qos_tunn" : { 
+        "1": "101124353", 
+        "2": "10000001", 
+        "3": "5" },
+    "sec_result" : {
+        "1": "performed",
+        "2": "performed"},
+    "help" : "true",
+    "qos_failed_lst" : [{ "1": "5", "2": "deregister"}, 
+                        { "1": "6", "2": "normal-release"}] 
+}
+  

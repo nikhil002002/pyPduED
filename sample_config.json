@@ -1,0 +1,11 @@
+{
+    "msg_type" : "PDU_SESS_RSRC_SETUP_REQ",
+    "ambr" : {
+        "1": 6000000,
+        "2": 6000000
+        },
+    "pdu_typ" : "ipv4", 
+    "qfi" : [ { "1": "5", "2": "5", "3": "9", "4":"shall-not-trigger-pre-emption", "5":"not-pre-emptable"} ],
+    "gtp_tunn" : {"1":"98615294594055401567350253808623404875904323600", "2": "40010105"}
+}
+

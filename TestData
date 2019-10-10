@@ -1,0 +1,415 @@
+C:\Users\nirajend\Documents\Personal\OneDrive\py/n1Decode.py 2e0101c1ffff91 "
+PDU Session Type: IPV4
+{
+    "Extended Prtocol Discriminator": 46,
+    "PDU Session ID:": 1,
+    "PTI:": 1,
+    "Message Type:": "PDU_SESS_EST_REQ",
+    "Integrity Protection Rate:": "ffff",
+    "PDU Session Type:": "IPV4"
+}
+
+
+PS C:\Users\nikhi\OneDrive\py> python n1Decode.py 2e0101c1ffff91A2B3280102
+PDU Session Type: IPV4
+SSC MODE: SSC_MODE_2
+Always-on PDU session requested
+5GSM Capability: Reflective QOS not Supported
+5GSM Capability: Multi-homed IPv6 PDU session supported
+{
+    "Extended Prtocol Discriminator": 46,
+    "PDU Session ID:": 1,
+    "PTI:": 1,
+    "Message Type:": "PDU_SESS_EST_REQ",
+    "Integrity Protection Rate:": "ffff",
+    "PDU Session Type:": "IPV4",
+    "SSC MODE:": "SSC_MODE_2",
+    "Always-on PDU session": 1,
+    "5GSM Capabilty": {
+        "ROS:": 0,
+        "MultiHome PDU:": 1
+    }
+}
+PS C:\Users\nikhi\OneDrive\py>
+
+
+
+PS C:\Users\nikhi\OneDrive\py> python n1Decode.py 2e0101c1ffff91A2B3280103
+PDU Session Type: IPV4
+SSC MODE: SSC_MODE_2
+Always-on PDU session requested
+5GSM Capability: RQOS SET
+5GSM Capability: Multi-homed IPv6 PDU session supported
+{
+    "Extended Prtocol Discriminator": 46,
+    "PDU Session ID:": 1,
+    "PTI:": 1,
+    "Message Type:": "PDU_SESS_EST_REQ",
+    "Integrity Protection Rate:": "ffff",
+    "PDU Session Type:": "IPV4",
+    "SSC MODE:": "SSC_MODE_2",
+    "Always-on PDU session": 1,
+    "5GSM Capabilty": {
+        "ROS:": 1,
+        "MultiHome PDU:": 1
+    }
+}
+PS C:\Users\nikhi\OneDrive\py>
+
+
+C:\Users\nirajend\Documents\Personal\OneDrive\py/n1Decode.py 2e0101c1ffff91 "
+PDU Session Type: IPV4
+{
+    "Extended Prtocol Discriminator": 46,
+    "PDU Session ID:": 1,
+    "PTI:": 1,
+    "Message Type:": "PDU_SESS_EST_REQ",
+    "Integrity Protection Rate:": "ffff",
+    "PDU Session Type:": "IPV4"
+}
+
+C:\Users\nirajend\Documents\Personal\OneDrive\py/n1Decode.py 2e0101c1ffff91 "
+PDU Session Type: IPV4
+{
+    "Extended Prtocol Discriminator": 46,
+    "PDU Session ID:": 1,
+    "PTI:": 1,
+    "Message Type:": "PDU_SESS_EST_REQ",
+    "Integrity Protection Rate:": "ffff",
+    "PDU Session Type:": "IPV4"
+}
+
+
+
+PS C:\Users\nirajend\Documents\Personal\OneDrive\py> & C:/Users
+('SEQUENCE', {
+protocolIEs: ('SEQUENCE OF', ('SEQUENCE', {
+ id: 'INTEGER',
+ criticality: 'ENUMERATED',
+ value: ('OPEN_TYPE', {
+  ('NGAP-IEs', 'PDUSessionAggregateMaximumBitRate'): ('SEQUENCE
+   pDUSessionAggregateMaximumBitRateDL: 'INTEGER',
+   pDUSessionAggregateMaximumBitRateUL: 'INTEGER',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   }),
+  PDUSessionAggregateMaximumBitRate: ('SEQUENCE', {
+   pDUSessionAggregateMaximumBitRateDL: 'INTEGER',
+   pDUSessionAggregateMaximumBitRateUL: 'INTEGER',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   }),
+  ('NGAP-IEs', 'UPTransportLayerInformation'): ('CHOICE', {
+   gTPTunnel: ('SEQUENCE', {
+    transportLayerAddress: 'BIT STRING',
+    gTP-TEID: 'OCTET STRING',
+    iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+     id: 'INTEGER',
+     criticality: 'ENUMERATED',
+     extensionValue: ('OPEN_TYPE', {})
+     }))
+    }),
+   choice-Extensions: ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    value: 'OPEN_TYPE'
+    })
+   }),
+  UPTransportLayerInformation: ('CHOICE', {
+   gTPTunnel: ('SEQUENCE', {
+    transportLayerAddress: 'BIT STRING',
+    gTP-TEID: 'OCTET STRING',
+    iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+     id: 'INTEGER',
+     criticality: 'ENUMERATED',
+     extensionValue: ('OPEN_TYPE', {})
+     }))
+    }),
+   choice-Extensions: ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    value: 'OPEN_TYPE'
+    })
+   }),
+  ('NGAP-IEs', 'DataForwardingNotPossible'): 'ENUMERATED',
+  DataForwardingNotPossible: 'ENUMERATED',
+  ('NGAP-IEs', 'PDUSessionType'): 'ENUMERATED',
+  PDUSessionType: 'ENUMERATED',
+  ('NGAP-IEs', 'SecurityIndication'): ('SEQUENCE', {
+   integrityProtectionIndication: 'ENUMERATED',
+   confidentialityProtectionIndication: 'ENUMERATED',
+   maximumIntegrityProtectedDataRate: 'ENUMERATED',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   }),
+  SecurityIndication: ('SEQUENCE', {
+   integrityProtectionIndication: 'ENUMERATED',
+   confidentialityProtectionIndication: 'ENUMERATED',
+   maximumIntegrityProtectedDataRate: 'ENUMERATED',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   }),
+  ('NGAP-IEs', 'NetworkInstance'): 'INTEGER',
+  NetworkInstance: 'INTEGER',
+  ('NGAP-IEs', 'QosFlowSetupRequestList'): ('SEQUENCE OF', ('SE
+   qosFlowIdentifier: 'INTEGER',
+   qosFlowLevelQosParameters: ('SEQUENCE', {
+    qosCharacteristics: ('CHOICE', {
+     nonDynamic5QI: ('SEQUENCE', {
+      fiveQI: 'INTEGER',
+      priorityLevelQos: 'INTEGER',
+      averagingWindow: 'INTEGER',
+      maximumDataBurstVolume: 'INTEGER',
+      iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+       id: 'INTEGER',
+       criticality: 'ENUMERATED',
+       extensionValue: ('OPEN_TYPE', {})
+       }))
+      }),
+     dynamic5QI: ('SEQUENCE', {
+      priorityLevelQos: 'INTEGER',
+      packetDelayBudget: 'INTEGER',
+      packetErrorRate: ('SEQUENCE', {
+       pERScalar: 'INTEGER',
+       pERExponent: 'INTEGER',
+       iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+        id: 'INTEGER',
+        criticality: 'ENUMERATED',
+        extensionValue: ('OPEN_TYPE', {})
+        }))
+       }),
+      fiveQI: 'INTEGER',
+      delayCritical: 'ENUMERATED',
+      averagingWindow: 'INTEGER',
+      maximumDataBurstVolume: 'INTEGER',
+      iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+       id: 'INTEGER',
+       criticality: 'ENUMERATED',
+       extensionValue: ('OPEN_TYPE', {})
+       }))
+      }),
+     choice-Extensions: ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      value: 'OPEN_TYPE'
+      })
+     }),
+    allocationAndRetentionPriority: ('SEQUENCE', {
+     priorityLevelARP: 'INTEGER',
+     pre-emptionCapability: 'ENUMERATED',
+     pre-emptionVulnerability: 'ENUMERATED',
+     iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      extensionValue: ('OPEN_TYPE', {})
+      }))
+     }),
+    gBR-QosInformation: ('SEQUENCE', {
+     maximumFlowBitRateDL: 'INTEGER',
+     maximumFlowBitRateUL: 'INTEGER',
+     guaranteedFlowBitRateDL: 'INTEGER',
+     guaranteedFlowBitRateUL: 'INTEGER',
+     notificationControl: 'ENUMERATED',
+     maximumPacketLossRateDL: 'INTEGER',
+     maximumPacketLossRateUL: 'INTEGER',
+     iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      extensionValue: ('OPEN_TYPE', {})
+      }))
+     }),
+    reflectiveQosAttribute: 'ENUMERATED',
+    additionalQosFlowInformation: 'ENUMERATED',
+    iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+     id: 'INTEGER',
+     criticality: 'ENUMERATED',
+     extensionValue: ('OPEN_TYPE', {})
+     }))
+    }),
+   e-RAB-ID: 'INTEGER',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   })),
+  QosFlowSetupRequestList: ('SEQUENCE OF', ('SEQUENCE', {
+   qosFlowIdentifier: 'INTEGER',
+   qosFlowLevelQosParameters: ('SEQUENCE', {
+    qosCharacteristics: ('CHOICE', {
+     nonDynamic5QI: ('SEQUENCE', {
+      fiveQI: 'INTEGER',
+      priorityLevelQos: 'INTEGER',
+      averagingWindow: 'INTEGER',
+      maximumDataBurstVolume: 'INTEGER',
+      iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+       id: 'INTEGER',
+       criticality: 'ENUMERATED',
+       extensionValue: ('OPEN_TYPE', {})
+       }))
+      }),
+     dynamic5QI: ('SEQUENCE', {
+      priorityLevelQos: 'INTEGER',
+      packetDelayBudget: 'INTEGER',
+      packetErrorRate: ('SEQUENCE', {
+       pERScalar: 'INTEGER',
+       pERExponent: 'INTEGER',
+       iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+        id: 'INTEGER',
+        criticality: 'ENUMERATED',
+        extensionValue: ('OPEN_TYPE', {})
+        }))
+       }),
+      fiveQI: 'INTEGER',
+      delayCritical: 'ENUMERATED',
+      averagingWindow: 'INTEGER',
+      maximumDataBurstVolume: 'INTEGER',
+      iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+       id: 'INTEGER',
+       criticality: 'ENUMERATED',
+       extensionValue: ('OPEN_TYPE', {})
+       }))
+      }),
+     choice-Extensions: ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      value: 'OPEN_TYPE'
+      })
+     }),
+    allocationAndRetentionPriority: ('SEQUENCE', {
+     priorityLevelARP: 'INTEGER',
+     pre-emptionCapability: 'ENUMERATED',
+     pre-emptionVulnerability: 'ENUMERATED',
+     iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      extensionValue: ('OPEN_TYPE', {})
+      }))
+     }),
+    gBR-QosInformation: ('SEQUENCE', {
+     maximumFlowBitRateDL: 'INTEGER',
+     maximumFlowBitRateUL: 'INTEGER',
+     guaranteedFlowBitRateDL: 'INTEGER',
+     guaranteedFlowBitRateUL: 'INTEGER',
+     notificationControl: 'ENUMERATED',
+     maximumPacketLossRateDL: 'INTEGER',
+     maximumPacketLossRateUL: 'INTEGER',
+     iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+      id: 'INTEGER',
+      criticality: 'ENUMERATED',
+      extensionValue: ('OPEN_TYPE', {})
+      }))
+     }),
+    reflectiveQosAttribute: 'ENUMERATED',
+    additionalQosFlowInformation: 'ENUMERATED',
+    iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+     id: 'INTEGER',
+     criticality: 'ENUMERATED',
+     extensionValue: ('OPEN_TYPE', {})
+     }))
+    }),
+   e-RAB-ID: 'INTEGER',
+   iE-Extensions: ('SEQUENCE OF', ('SEQUENCE', {
+    id: 'INTEGER',
+    criticality: 'ENUMERATED',
+    extensionValue: ('OPEN_TYPE', {})
+    }))
+   }))
+  })
+ }))
+})
+
+
+
+
+
+None
+<protocolIEs ([ProtocolIE-Container] SEQUENCE OF)>
+<_item_ ([ProtocolIE-Field] SEQUENCE)>
+1
+
+<NGAP-PDU (CHOICE)>
+
+2
+
+<PDUSessionResourceSetupRequest (SEQUENCE)>
+3
+
+4
+
+<PDUSessionResourceSetupRequestTransferIEs ([NGAP-PROTOCOL-IES]icality': 'reject', 'Value': <Value ([UPTransportLayerInformati27, 'criticality': 'reject', 'Value': <Value ([DataForwardingNo 138, 'criticality': 'reject', 'Value': <Value ([SecurityIndicaticality': 'reject', 'Value': <Value ([QosFlowSetupRequestList]
+{
+id: <id ([ProtocolIE-ID] INTEGER):  >,
+criticality: <criticality ([Criticality] ENUMERATED):  >,
+Value: <Value (OPEN_TYPE)>,
+presence: <presence ([Presence] ENUMERATED):  >
+}
+{'id': 130, 'criticality': 'reject', 'Value': <Value ([PDUSessi
+{'id': 139, 'criticality': 'reject', 'Value': <Value ([UPTransp
+{'id': 126, 'criticality': 'reject', 'Value': <Value ([UPTransp
+{'id': 127, 'criticality': 'reject', 'Value': <Value ([DataForw
+{'id': 134, 'criticality': 'reject', 'Value': <Value ([PDUSessi
+{'id': 138, 'criticality': 'reject', 'Value': <Value ([Security
+{'id': 129, 'criticality': 'reject', 'Value': <Value ([NetworkI
+{'id': 136, 'criticality': 'reject', 'Value': <Value ([QosFlowS
+{
+  protocolIEs {
+    {
+      id 130,
+      criticality reject,
+      value PDUSessionAggregateMaximumBitRate: {
+        pDUSessionAggregateMaximumBitRateDL 6000000,
+        pDUSessionAggregateMaximumBitRateUL 4000000
+      }
+    },
+    {
+      id 134,
+      criticality reject,
+      value PDUSessionType: ipv4
+    },
+    {
+      id 139,
+      criticality reject,
+      value UPTransportLayerInformation: gTPTunnel : {
+        transportLayerAddress '114610103FFE00000000000000000000
+        gTP-TEID '40010105'H
+      }
+    },
+    {
+      id 136,
+      criticality reject,
+      value QosFlowSetupRequestList: {
+        {
+          qosFlowIdentifier 5,
+          qosFlowLevelQosParameters {
+            qosCharacteristics nonDynamic5QI : {
+
+
+
+
+
+
+
+              pre-emptionVulnerability not-pre-emptable
+            }
+          }
+        }
+      }
+    }
+  }
+}
+b'00000400820008085b8d80203d09000086000100008b001a09f0114610103ffe000000000000000000001146101040010105008800070005000005200
+0'
+PS C:\Users\nirajend\Documents\Personal\OneDrive\py>
