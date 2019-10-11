@@ -289,10 +289,16 @@ class N2Decoder2:
             logger.error("The Config file did not have a key for msg_type and a hex value. You need to pass the hex and type of message you want to decode")
             return 
 
+        #########################
+        logger.info(f"Starting Decode of {hex_ip} Message To Decode {msg_to_decode}")
+        #########################
 
-        logger.info(f"Starting Decode of {hex_ip}")
         if msg_to_decode == 'PDU_SESS_RSRC_SETUP_REQ':
-                ret = self.decode_PduSessionResourceSetupRequestTransfer(hex_ip)
+            ret = self.decode_PduSessionResourceSetupRequestTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_SETUP_RSP':
+            ret = self.decode_PduSessionResourceSetupResponseTransfer(hex_ip)
+
         else:
             logger.error(f"msg_type {msg_to_decode} is undefined")
             return 0
@@ -300,8 +306,32 @@ class N2Decoder2:
         print(f"Decoded Value is: {ret}")
 
 
-    def decode_PduSessionResourceSetupRequestTransfer(self, hexString, **kwargs):
+    def decode_PduSessionResourceSetupResponseTransfer(self, hexString, **kwargs):
 
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Setup Transfer Req. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PduSessionResourceSetupRequestTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Setup Response Transfer
+        """
         debug       = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
@@ -319,6 +349,17 @@ class N2Decoder2:
             ret = ""
 
         return ret
+
+
+
+
+
+
+
+
+
+
+
 
 
 class N2Decoder:
@@ -660,8 +701,8 @@ if __name__ ==  "__main__" :
     ########################
     # PDU Session rsrc Setup response
     ########################
-    n2Obj.encode_PduSessionResourceSetupResponseTransfer( qos_per_tunn = ( '101124353', '10000001', 5 ), addn_qos_tunn = ( '101124353', '10000001', 5 ), 
-                sec_result = ('performed','performed'), qos_failed_lst = [('5', 'deregister'), ('6', 'normal-release')] )
+    #n2Obj.encode_PduSessionResourceSetupResponseTransfer( qos_per_tunn = ( '101124353', '10000001', 5 ), addn_qos_tunn = ( '101124353', '10000001', 5 ), 
+    #            sec_result = ('performed','performed'), qos_failed_lst = [('5', 'deregister'), ('6', 'normal-release')] )
     #7003e006070901100000010005007c0607090110000001000500102a406400
 
     #n2Obj.encode_PduSessionResourceSetupResponseTransfer( qos_per_tunn = ( '101124353', '10000001', 5 ), sec_result = ('performed','performed'), qos_failed_lst = [('5', 'deregister'), ('6', 'normal-release')])
