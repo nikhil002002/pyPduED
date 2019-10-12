@@ -286,7 +286,23 @@ class N2Decoder2:
             PDU_SESS_RSRC_NOTF
             PDU_SESS_RSRC_MOD_IND
             PDU_SESS_RSRC_MOD_CONF
+
+            PATH_SW_REQ
+            PATH_SW_REQ_ACK
+            HANDOVER_CMD
+            HANDOVER_REQ_ACK
+            PDU_SESS_RSRC_REL_CMD
+            PDU_SESS_RSRC_NOTF_REL
+            HANDOVER_REQIRED
+            PATH_SW_REQ_SETUP_FAIL
+            PDU_SESS_RSRC_SETUP_UNSUCESS
+            PDU_SESS_RSRC_MOD_UNSUCESS
+            HANDOVER_PREP_UNSUCESS
+            HANDOVER_RSRC_ALLOC_UNSUCESS
+            PATH_SW_REQ_UNSUCESS
+            PDU_SESS_RSRC_REL_RESP
         """
+
         if 'msg_type' in kwargs and 'hex' in kwargs:
             msg_to_decode = kwargs['msg_type']
             hex_ip = kwargs['hex']
@@ -309,37 +325,60 @@ class N2Decoder2:
 
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_RSP':
             ret = self.decode_PduSessionResourceModifyResponseTransfer(hex_ip) 
-            
+
         elif msg_to_decode == 'PDU_SESS_RSRC_NOTF':
             ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip) 
-            
+
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_IND':
             ret = self.decode_PduSessionResourceModifyIndicationTransfer(hex_ip)
-            
+
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_CONF':
             ret = self.decode_PduSessionResourceModifyConfirmTransfer(hex_ip)
-            
+
+        elif msg_to_decode == 'PATH_SW_REQ':
+            ret = self.decode_PathSwitchRequestTransfer(hex_ip)
+        
+        elif msg_to_decode == 'PATH_SW_REQ_ACK':
+            ret = self.decode_PathSwitchRequestAcknowledgeTransfer(hex_ip)
+        
+        elif msg_to_decode == 'HANDOVER_CMD':
+            ret = self.decode_HandoverCommandTransfer(hex_ip)
+
+        elif msg_to_decode == 'HANDOVER_REQ_ACK':
+            ret = self.decode_HandoverRequestAcknowledgeTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_REL_CMD':
+            ret = self.decode_PduSessionResourceReleaseCommandTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_NOTF_REL':
+            ret = self.decode_PduSessionResourceNotifyReleasedTransfer(hex_ip)
+
+        elif msg_to_decode == 'HANDOVER_REQIRED':
+            ret = self.decode_HandoverRequiredTransfer(hex_ip)
+
+        elif msg_to_decode == 'PATH_SW_REQ_SETUP_FAIL':
+            ret = self.decode_PathSwitchRequestSetupFailedTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_SETUP_UNSUCESS':
+            ret = self.decode_PDUSessionResourceSetupUnsuccessfulTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_MOD_UNSUCESS':
+            ret = self.decode_PDUSessionResourceModifyUnsuccessfulTransfer(hex_ip)
+
+        elif msg_to_decode == 'HANDOVER_PREP_UNSUCESS':
+            ret = self.decode_HandoverPreparationUnsuccessfulTransfer(hex_ip)
+
+        elif msg_to_decode == 'HANDOVER_RSRC_ALLOC_UNSUCESS':
+            ret = self.decode_HandoverResourceAllocationUnsuccessfulTransfer(hex_ip)
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_REL_RESP':
+            ret = self.decode_PDUSessionResourceReleaseResponseTransfer(hex_ip)
+
         else:
             logger.error(f"msg_type {msg_to_decode} is undefined")
             return 0
 
         print(f"Decoded Value is: {ret}")
-
-
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestAcknowledgeTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverCommandTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseCommandTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyReleasedTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
 
 
 
@@ -348,7 +387,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Setup Response Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
         if debug == "true":
@@ -360,7 +399,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Setup Transfer Req. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Setup Transfer Req.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -369,7 +409,7 @@ class N2Decoder2:
 
     def decode_PduSessionResourceSetupResponseTransfer(self, hexString, **kwargs):
 
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
         if debug == "true":
@@ -381,7 +421,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Response Transfer Req. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Response Transfer Req.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -394,9 +435,9 @@ class N2Decoder2:
         """
         Decoder for PDU Session Setup Resource Modify Request Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj =NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -406,7 +447,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Modify Req transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Modify Req transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -418,7 +460,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Setup Resource Modify Response Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
         if debug == "true":
@@ -430,7 +472,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Modify Resp Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Modify Resp Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -442,7 +485,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Setup Resource Notify Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyTransfer
         if debug == "true":
@@ -454,7 +497,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Notify Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Notify Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -466,7 +510,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Resource Modify Indication Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyIndicationTransfer
         if debug == "true":
@@ -478,7 +522,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Indication Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Indication Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -491,7 +536,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Resource Modify Confirm Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyConfirmTransfer
         if debug == "true":
@@ -502,7 +547,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Confirm Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Confirm Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -513,7 +559,7 @@ class N2Decoder2:
         """
         Decoder for Path Switch Request Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestTransfer
         if debug == "true":
@@ -524,7 +570,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Path Switch Request Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for Path Switch Request Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -536,7 +583,7 @@ class N2Decoder2:
         """
         Decoder for Path Switch Request Acknowledge Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestAcknowledgeTransfer
         if debug == "true":
@@ -547,7 +594,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Path Switch Request Acknowledge Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for Path Switch Request Acknowledge Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -558,7 +606,7 @@ class N2Decoder2:
         """
         Decoder for Handover Command Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.HandoverCommandTransfer
         if debug == "true":
@@ -569,7 +617,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Handover Command Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for Handover Command Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -580,7 +629,7 @@ class N2Decoder2:
         """
         Decoder for Handover Request Ack Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
         if debug == "true":
@@ -591,7 +640,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Handover Req Ack Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for Handover Req Ack Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -602,7 +652,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Resource Release Command Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseCommandTransfer
         if debug == "true":
@@ -613,7 +663,8 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Release CMD Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Session Resource Release CMD Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -625,7 +676,7 @@ class N2Decoder2:
         """
         Decoder for PDU Session Resource Notify Released Transfer
         """
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
 
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyReleasedTransfer
         if debug == "true":
@@ -636,7 +687,126 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Notify Released Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for PDU Session Resource Notify Released Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+    def decode_HandoverRequiredTransfer(self, hexString, **kwargs):
+        """
+        Decoder for Handover Required Transfer
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for Handover Required Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PathSwitchRequestSetupFailedTransfer(self, hexString, **kwargs):
+        """
+        Decoder for Path Switch Request Setup Failed Transfer
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for Path Switch Request Setup Failed Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+    def decode_PDUSessionResourceSetupUnsuccessfulTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Resource Setup Unsuccessful Transfer
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Session Resource Setup Unsuccessful Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PDUSessionResourceModifyUnsuccessfulTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Resource Modify Unsuccessful Transfer
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Session Resource Modify Unsuccessful Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_HandoverPreparationUnsuccessfulTransfer(self, hexString, **kwargs):
+        """
+        Decoder for Handover Preparation Unsuccessful Transfer
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for  Handover Preparation Unsuccessful Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -645,14 +815,77 @@ class N2Decoder2:
 
 
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
+    def decode_HandoverResourceAllocationUnsuccessfulTransfer(self, hexString, **kwargs):
+        """
+        Decoder for Handover Resource Allocation Unsuccessful Transfer 
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
         decode_obj = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for Handover Resource Allocation Unsuccessful Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+    def decode_PathSwitchRequestUnsuccessfulTransfer(self, hexString, **kwargs):
+        """
+        Decoder for Path Switch Request Unsuccessful Transfer 
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
         decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestUnsuccessfulTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for Path Switch Request Unsuccessful Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PDUSessionResourceReleaseResponseTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Resource Release Response Transfer 
+        """
+        debug = kwargs['debug']    if 'debug'     in kwargs else None
+
         decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Session Resource Release Response Transfer.\
+                Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
 
 
 
