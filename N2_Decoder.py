@@ -305,19 +305,19 @@ class N2Decoder2:
             ret = self.decode_PduSessionResourceSetupResponseTransfer(hex_ip)
 
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_REQ':
-           ret = self.decode_PduSessionResourceModifyRequestTransfer(hex_ip) 
+            ret = self.decode_PduSessionResourceModifyRequestTransfer(hex_ip) 
 
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_RSP':
-           ret = self.decode_PduSessionResourceModifyResponseTransfer(hex_ip) 
+            ret = self.decode_PduSessionResourceModifyResponseTransfer(hex_ip) 
             
         elif msg_to_decode == 'PDU_SESS_RSRC_NOTF':
-           ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip) 
+            ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip) 
             
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_IND':
-           ret = self.decode_PduSessionResourceModifyIndicationTransfer(hex_ip)
+            ret = self.decode_PduSessionResourceModifyIndicationTransfer(hex_ip)
             
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_CONF':
-           ret = self.decode_PduSessionResourceModifyConfirmTransfer(hex_ip)
+            ret = self.decode_PduSessionResourceModifyConfirmTransfer(hex_ip)
             
         else:
             logger.error(f"msg_type {msg_to_decode} is undefined")
