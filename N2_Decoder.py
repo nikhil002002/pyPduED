@@ -281,6 +281,11 @@ class N2Decoder2:
         Supported message types:
             PDU_SESS_RSRC_SETUP_REQ
             PDU_SESS_RSRC_SETUP_RSP
+            PDU_SESS_RSRC_MOD_REQ
+            PDU_SESS_RSRC_MOD_RSP
+            PDU_SESS_RSRC_NOTF
+            PDU_SESS_RSRC_MOD_IND
+            PDU_SESS_RSRC_MOD_CONF
         """
         if 'msg_type' in kwargs and 'hex' in kwargs:
             msg_to_decode = kwargs['msg_type']
@@ -299,6 +304,21 @@ class N2Decoder2:
         elif msg_to_decode == 'PDU_SESS_RSRC_SETUP_RSP':
             ret = self.decode_PduSessionResourceSetupResponseTransfer(hex_ip)
 
+        elif msg_to_decode == 'PDU_SESS_RSRC_MOD_REQ':
+           ret = self.decode_PduSessionResourceModifyRequestTransfer(hex_ip) 
+
+        elif msg_to_decode == 'PDU_SESS_RSRC_MOD_RSP':
+           ret = self.decode_PduSessionResourceModifyResponseTransfer(hex_ip) 
+            
+        elif msg_to_decode == 'PDU_SESS_RSRC_NOTF':
+           ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip) 
+            
+        elif msg_to_decode == 'PDU_SESS_RSRC_MOD_IND':
+           ret = self.decode_PduSessionResourceModifyIndicationTransfer(hex_ip)
+            
+        elif msg_to_decode == 'PDU_SESS_RSRC_MOD_CONF':
+           ret = self.decode_PduSessionResourceModifyConfirmTransfer(hex_ip)
+            
         else:
             logger.error(f"msg_type {msg_to_decode} is undefined")
             return 0
@@ -306,25 +326,6 @@ class N2Decoder2:
         print(f"Decoded Value is: {ret}")
 
 
-    def decode_PduSessionResourceSetupResponseTransfer(self, hexString, **kwargs):
-
-        debug       = kwargs['debug']    if 'debug'     in kwargs else None
-
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
-        if debug == "true":
-            logger.debug(decode_obj)
-
-        #help(t)
-        try:
-            decode_obj.from_aper(unhexlify(hexString))
-            #ret = decode_obj.to_asn1()
-            ret = decode_obj.to_json()
-        except Exception:
-            logger.exception("Error in Decoding Hex for PDU Sess Setup Transfer Req. Try Decoding using the Online tool. If it works then it is a concern!")
-            print("Could Not Decode. Some Exception")
-            ret = ""
-
-        return ret
 
 
 
@@ -351,11 +352,147 @@ class N2Decoder2:
         return ret
 
 
+    def decode_PduSessionResourceSetupResponseTransfer(self, hexString, **kwargs):
+
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Response Transfer Req. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
 
 
 
 
+    def decode_PduSessionResourceModifyRequestTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Setup Resource Modify Request Transfer
+        """
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
 
+        decode_obj =NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Modify Req transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PduSessionResourceModifyResponseTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Setup Resource Modify Response Transfer
+        """
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Modify Resp Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PduSessionResourceNotifyTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Setup Resource Notify Transfer
+        """
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Notify Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+    def decode_PduSessionResourceModifyIndicationTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Resource Modify Indication Transfer
+        """
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyIndicationTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Indication Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
+
+
+
+
+    def decode_PduSessionResourceModifyConfirmTransfer(self, hexString, **kwargs):
+        """
+        Decoder for PDU Session Resource Modify Confirm Transfer
+        """
+        debug       = kwargs['debug']    if 'debug'     in kwargs else None
+
+        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyConfirmTransfer
+        if debug == "true":
+            logger.debug(decode_obj)
+
+        #help(t)
+        try:
+            decode_obj.from_aper(unhexlify(hexString))
+            #ret = decode_obj.to_asn1()
+            ret = decode_obj.to_json()
+        except Exception:
+            logger.exception("Error in Decoding Hex for PDU Sess Rsrc Modify Confirm Transfer. Try Decoding using the Online tool. If it works then it is a concern!")
+            print("Could Not Decode. Some Exception")
+            ret = ""
+
+        return ret
 
 
 
