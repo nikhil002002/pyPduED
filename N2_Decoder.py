@@ -910,8 +910,10 @@ class N2Decoder:
             "gtp_tunn" : {"1":"98615294594055401567350253808623404875904323600", "2": "40010105"}
         }
 
-        for what keys can be used as arguments for encoding a particular message check out the detailed help command
-        To use the detailed help command, in the config file, set msg_typ to one of the below supported types
+        for what keys can be used as arguments for encoding a particular message\
+        check out the detailed help command
+        To use the detailed help command, in the config file,\
+        set msg_typ to one of the below supported types
         and give a second key "help" : "true"
         
         Supported message types:
@@ -933,14 +935,14 @@ class N2Decoder:
             help_flag = 1
 
         if msg_to_encode == 'PDU_SESS_RSRC_SETUP_REQ':
-            if help_flag != 1 :
+            if help_flag != 1:
                 ret = self.encode_PduSessionResourceSetupRequestTransfer(**kwargs)
             else:
                 print(self.encode_PduSessionResourceSetupRequestTransfer.__doc__)
                 return 0
 
         elif msg_to_encode == 'PDU_SESS_RSRC_SETUP_RSP':
-            if help_flag != 1 :
+            if help_flag != 1:
                 ret = self.encode_PduSessionResourceSetupResponseTransfer(**kwargs)
             else:
                 print(self.encode_PduSessionResourceSetupResponseTransfer.__doc__)
