@@ -28,7 +28,6 @@ def test():
     t = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
     print(t)
     #help(t)
-    #t.from_aper(unhexlify('00000400820008081e8480203d09000086000100008b001a09f0114610103ffe0000000000000000000011461010400101050088000700050000052000'))
     t.from_aper(unhexlify('00000400820008081e8480203d09000086000100008b001a09f0114610103ffe0000000000000000000011461010400101050088000700050000052000'))
 
     #t()
@@ -286,7 +285,6 @@ class N2Decoder2:
             PDU_SESS_RSRC_NOTF
             PDU_SESS_RSRC_MOD_IND
             PDU_SESS_RSRC_MOD_CONF
-
             PATH_SW_REQ
             PATH_SW_REQ_ACK
             HANDOVER_CMD
@@ -307,8 +305,9 @@ class N2Decoder2:
             msg_to_decode = kwargs['msg_type']
             hex_ip = kwargs['hex']
         else:
-            logger.error("The Config file did not have a key for msg_type and a hex value. You need to pass the hex and type of message you want to decode")
-            return 
+            logger.error("The Config file did not have a key for msg_type and\
+                a hex value. You need to pass the hex and type of message you want to decode")
+            return
 
         #########################
         logger.info(f"Starting Decode of {hex_ip} Message To Decode {msg_to_decode}")
@@ -663,8 +662,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Release CMD Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                PDU Session Resource Release CMD Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -687,8 +688,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Notify Released Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                PDU Session Resource Notify Released Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -734,8 +737,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Path Switch Request Setup Failed Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                Path Switch Request Setup Failed Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -757,8 +762,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Setup Unsuccessful Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                PDU Session Resource Setup Unsuccessful Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -781,8 +788,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Modify Unsuccessful Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                PDU Session Resource Modify Unsuccessful Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -805,8 +814,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for  Handover Preparation Unsuccessful Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                Handover Preparation Unsuccessful Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -830,8 +841,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Handover Resource Allocation Unsuccessful Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                Handover Resource Allocation Unsuccessful Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -853,8 +866,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for Path Switch Request Unsuccessful Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                Path Switch Request Unsuccessful Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -877,8 +892,10 @@ class N2Decoder2:
             #ret = decode_obj.to_asn1()
             ret = decode_obj.to_json()
         except Exception:
-            logger.exception("Error in Decoding Hex for PDU Session Resource Release Response Transfer.\
-                Try Decoding using the Online tool. If it works then it is a concern!")
+            logger.exception("Error in Decoding Hex for\
+                PDU Session Resource Release Response Transfer.\
+                Try Decoding using the Online tool.\
+                If it works then it is a concern!")
             print("Could Not Decode. Some Exception")
             ret = ""
 
@@ -919,6 +936,7 @@ class N2Decoder:
         Supported message types:
         PDU_SESS_RSRC_SETUP_REQ
         PDU_SESS_RSRC_SETUP_RSP
+        PDU_SESS_RSRC_REL_RESP
 
         """
         help_flag = 0
@@ -1134,6 +1152,100 @@ class N2Decoder:
         if self.debug ==  'true':
             logger.debug(encodePSRSRespTransfer._cont)
             logger.debug(encodePSRSRespTransfer.get_proto())
+        """
+        {
+        qosFlowPerTNLInformation: <qosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>,
+        additionalQosFlowPerTNLInformation: <additionalQosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>,
+        securityResult: <securityResult ([SecurityResult] SEQUENCE)>,
+        qosFlowFailedToSetupList: <qosFlowFailedToSetupList ([QosFlowList] SEQUENCE OF)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+
+        IEs.asn
+        PDUSessionResourceSetupResponseTransfer ::= SEQUENCE {
+            qosFlowPerTNLInformation				QosFlowPerTNLInformation,
+            additionalQosFlowPerTNLInformation		QosFlowPerTNLInformation											OPTIONAL,
+            securityResult							SecurityResult														OPTIONAL,
+            qosFlowFailedToSetupList				QosFlowList															OPTIONAL,
+            iE-Extensions		ProtocolExtensionContainer { {PDUSessionResourceSetupResponseTransfer-ExtIEs} }		OPTIONAL,
+            ...
+        }
+        """
+
+        IEs = {} # let's build the list of IEs values
+
+        if self.qos_per_tunn is not None:
+            addr = self.qos_per_tunn["1"]
+            teid = unhexlify(self.qos_per_tunn["2"])
+            qfi = int(self.qos_per_tunn["3"])
+            #IEs = {'qosFlowPerTNLInformation': {'uPTransportLayerInformation': 
+            #        ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}}
+            IEs['qosFlowPerTNLInformation'] = {'uPTransportLayerInformation': 
+                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}
+            #debugger.set_trace()
+
+        if self.addn_qos_tunn is not None:
+            addr = self.addn_qos_tunn["1"]
+            teid = unhexlify(self.addn_qos_tunn["2"])
+            qfi = int(self.addn_qos_tunn["3"])
+            IEs['additionalQosFlowPerTNLInformation'] = {'uPTransportLayerInformation': 
+                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}
+            #debugger.set_trace()
+
+        if self.sec_result is not None:
+            ip_result   = self.sec_result["1"]
+            conf_result = self.sec_result["2"]
+            IEs['securityResult'] = {'integrityProtectionResult': ip_result, 'confidentialityProtectionResult': conf_result}
+
+        #9.3.1.13 38.413
+        if self.qos_failed_lst is not None:
+            tmp = []
+            #it is a list of { QFI, cause}, only nas cause supported
+            for flow_item in self.qos_failed_lst:
+                tmp.append( {'qosFlowIdentifier': int(flow_item["1"]), 'cause': ('nas', flow_item["2"]) })
+
+            IEs['qosFlowFailedToSetupList'] = tmp
+
+
+        try:
+            encodePSRSRespTransfer.set_val(IEs)
+        except:
+            logger.exception("Error setting values for PDU Sess Setup Resp Transfer")
+            logger.debug(f"Array: {IEs}")
+            return 0
+
+        try:
+            ret = hexlify(encodePSRSRespTransfer.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodePSRSRespTransfer.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding PDU Sess Setup Resp Transfer")
+        else:
+            return ret
+
+
+
+
+
+    def encode_PduSessionResourceReleaseResponseTransfer(self, **kwargs):
+        """
+        Pass values to encode PDU Session Rsrc Setup Respone and return a hex stream
+
+        Keys/Args:
+
+        qos_per_tunn  -
+        addn_qos_tunn - Dict is of type (address, teid, QFI)
+        """
+
+        self.debug          = kwargs['debug']           if 'debug'          in kwargs else None
+        self.qos_per_tunn   = kwargs['qos_per_tunn']    if 'qos_per_tunn'   in kwargs else None
+
+        encodePSRRelRespTransfer = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodePSRRelRespTransfer._cont)
+            logger.debug(encodePSRRelRespTransfer.get_proto())
         """
         {
         qosFlowPerTNLInformation: <qosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>,
