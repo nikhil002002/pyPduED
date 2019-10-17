@@ -1,3 +1,6 @@
 pyPduProj.code-workspace
 *.log
 *.pyc
+build/
+.vscode/
+*.spec
