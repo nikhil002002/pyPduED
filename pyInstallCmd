@@ -1,0 +1,2 @@
+#Linux
+pyinstaller --distpath ./lin/dist --workpath ./lin/build -F --specpath ./lin/spec --paths /nirajend/SW/pycrate --key <> N2_Encode_Decode.py

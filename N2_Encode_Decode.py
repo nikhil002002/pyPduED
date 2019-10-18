@@ -22,15 +22,14 @@ logger.addHandler(f_handler)
 def print_help(opr_typ):
     """
     """
-    print("The Command can be used as N2_Encode_Decode <opr> [-i|--inputFile] [x|hex]")
+    print("The Command can be used as N2_Encode_Decode <opr> [-i|--inputFile]")
     print("<opr> can be encode or decode")
-    print("-i|--inputFile is the json file that contain the various opts in Json format to be used incase the opr is encode")
-    print(" x|--hex is the hex string in case opr is decode ")
+    print("-i|--inputFile is the json file that contain the various opts in Json format")
 
     if opr_typ == "encode":
         print(N2_Decoder.N2Decoder.start_encode.__doc__)
-    #if opr_typ == "decode":
-        #print(N2_Decoder.N2Decoder.start_decode.__doc__)
+    if opr_typ == "decode":
+        print(N2_Decoder.N2Decoder2.start_decode.__doc__)
 
 
 def is_hex(inp):
