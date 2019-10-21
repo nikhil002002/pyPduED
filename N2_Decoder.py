@@ -275,7 +275,7 @@ class N2Decoder2:
         """
         Decoder works based on a Hex string passed from the cmd Line
 
-        Usage: N2_Encode_Decode.py encode -x[--hex] <hexstring>
+        Usage: N2_Encode_Decode.py decode -i sample_config.json
 
         Supported message types:
             PDU_SESS_RSRC_SETUP_REQ
