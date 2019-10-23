@@ -27,7 +27,8 @@ from pycrate_core.elt   import *
 from pycrate_core.base  import *
 
 from pycrate_mobile.TS24007    import *
-#from .TS24301_IE import *
+from TS24501_IE import *
+
 
 # section 9.8
 _FIVEGSM_DICT = {
