@@ -1,0 +1,17 @@
+{
+    "msg_type" : "PATH_SW_REQ",
+    "up_transport" : {
+        "1" : "98615294594055401567350253808623404875904323600", 
+        "2" : "40010105"
+    },
+    "tnl_info_reuse" : "true",
+    "user_plane_sec" : {
+        "1": "performed",
+        "2": "not-performed",
+        "3": "required",
+        "4": "not-needed",
+        "5": "maximum-UE-rate"
+    },
+    "qos_flow_accept" : [1 , 2, 3]
+}
+

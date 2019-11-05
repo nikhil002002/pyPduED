@@ -12,7 +12,7 @@ from binascii import unhexlify
 from binascii import hexlify
 
 
-#logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 #logger.setLevel(logging.DEBUG)
@@ -1234,21 +1234,30 @@ class N2Decoder:
             return ret
 
 
-    def encode_UPTransportLayerInformation(self, addr, teid):
-        "Return a tuple with Up Transport information"
-        teid = unhexlify(teid)
-        return ('UPTransportLayerInformation', 
-                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 160), 'gTP-TEID': teid }))})
-
-
     def encode_PathSwithRequestTransfer(self, **kwargs):
         """
         Pass values to encode Path Switch Request and return a hex stream
         PATH_SW_REQ
         Keys/Args:
 
-        qos_per_tunn  -
-        addn_qos_tunn - Dict is of type (address, teid, QFI)
+        up_transport -  Dict is of type
+                    {"1": <address as bit string>, "2": <TEID without0x>}
+        tnl_info_reuse - if present (any value), the IE is set to 'true'
+        user_plane_sec - Dict is of type
+                    { "1" - Integrity Protection result,
+                      "2" - Confidentiality Protection result,
+                      "3" - Integrity Protection Indication,
+                      "4" - Confidentialty Protection Result,
+                      "5" - Maximum Integrity protection data rate (optional)
+                      }
+                      For 1,2: possible values:
+                            performed / not-performed
+                      For 3,4 : possible values:  
+                            required / preferred / not-needed
+                      For 5: possible values:
+                            bitrate64kbs / maximum-UE-rate
+
+        qos_flow_accept: List of QFIs (1, 2, 3...)
         """
 
         self.debug          = kwargs['debug']           if 'debug'          in kwargs else None
@@ -1280,36 +1289,16 @@ class N2Decoder:
         iE-Extensions		ProtocolExtensionContainer { {PathSwitchRequestTransfer-ExtIEs} }	OPTIONAL,
         ...
         }
-
-        IntegrityProtectionIndication ::= ENUMERATED {
-            required,
-            preferred,
-            not-needed,
-            ...
-        }
-        ConfidentialityProtectionIndication ::= ENUMERATED {
-            required,
-            preferred,
-            not-needed,
-            ...
-        }
-
-        MaximumIntegrityProtectedDataRate ::= ENUMERATED {
-            bitrate64kbs,
-            maximum-UE-rate,
-            ...
-        }
         """
 
         IEs = {} # let's build the list of IEs values
 
         if self.up_transport is not None:
-            addr = self.up_transport["1"]
-            upTransport = encode_UPTransportLayerInformation(self.addr, self.up_transport[2])
+            self.addr = self.up_transport["1"]
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"])
             #IEs = {'qosFlowPerTNLInformation': {'uPTransportLayerInformation': 
             #        ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}}
-            IEs['dL-NGU-UP-TNLInformation'] = {'uPTransportLayerInformation': 
-                    upTransport }
+            IEs['dL-NGU-UP-TNLInformation'] = upTransport
             #debugger.set_trace()
         else:
             logger.error("Up Transport information is mandatory")
@@ -1323,11 +1312,10 @@ class N2Decoder:
             self.conf_prot_result = self.user_plane_sec["2"]
             self.int_prot_indication = self.user_plane_sec["3"]
             self.conf_prot_indication = self.user_plane_sec["4"]
-            self.max_int_prot_data = self.user_plane_sec["5"]  if "5" in user_plane_sec else None
+            self.max_int_prot_data = self.user_plane_sec["5"]  if "5" in self.user_plane_sec else None
 
-            IEs['userPlaneSecurityInformation'] = encode_user_plane_sec_info(self.int_prot_result, 
-                self.conf_prot_result, self.int_prot_indication, self.conf_prot_indication, 
-                'max_int_prot_data' = self.max_int_prot_data)
+            IEs['userPlaneSecurityInformation'] = self.encode_user_plane_sec_info(self.int_prot_result, 
+                self.conf_prot_result, self.int_prot_indication, self.conf_prot_indication, max_int_prot_data=self.max_int_prot_data)
 
         if self.qos_flow_accept is not None:
             tmp = []
@@ -1346,6 +1334,7 @@ class N2Decoder:
         except:
             logger.exception("Error setting values for Path Switch Request Transfer")
             logger.debug(f"Array: {IEs}")
+            debugger.set_trace()
             return 0
 
         try:
@@ -1360,6 +1349,12 @@ class N2Decoder:
 
 
 
+    def encode_UPTransportLayerInformation(self, addr, teid):
+        "Return a tuple with Up Transport information"
+        teid = unhexlify(teid)
+        return ('gTPTunnel', {'transportLayerAddress': (int(addr), 160), 'gTP-TEID': teid })
+
+
     def encode_user_plane_sec_info(self, int_prot_result, conf_prot_result,
             int_prot_indication, conf_prot_indication, **kwargs):
         """
@@ -1367,10 +1362,12 @@ class N2Decoder:
         Has security result and security indication
         """
         max_int_prot_data = kwargs['max_int_prot_data'] if 'max_int_prot_data' in kwargs else None
-        
+        IEs = {}
         IEs['securityResult'] = self.encode_security_result(int_prot_result, conf_prot_result)
         IEs['securityIndication'] = self.encode_security_indication(int_prot_indication, 
-                                conf_prot_indication, 'max_int_prot_data' = max_int_prot_data)
+                                conf_prot_indication, max_int_prot_data = max_int_prot_data)
+        
+        return IEs
 
 
     def encode_security_result(self, int_prot_result, conf_prot_result):
@@ -1387,7 +1384,8 @@ class N2Decoder:
             ...
         }
         """
-        IEs['integrityProtectionResult'] = int_prot_result, 
+        IEs = {}
+        IEs['integrityProtectionResult'] = int_prot_result
         IEs['confidentialityProtectionResult'] = conf_prot_result
         return IEs
 
@@ -1414,7 +1412,7 @@ class N2Decoder:
         """
         ret_val = {'integrityProtectionIndication': int_prot_indication,
                     'confidentialityProtectionIndication': conf_prot_indication }
-        if max_int_prot_data is in kwargs:
+        if kwargs['max_int_prot_data'] is not None:
             ret_val['maximumIntegrityProtectedDataRate'] = kwargs['max_int_prot_data']
 
         return ret_val
