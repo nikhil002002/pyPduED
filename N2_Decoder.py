@@ -12,16 +12,18 @@ from binascii import unhexlify
 from binascii import hexlify
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger = logging.getLogger(__name__)
+
+
+#logger.setLevel(logging.DEBUG)
 # Create handlers
-f_handler = logging.FileHandler('n2EncoderDecoder.log', 'a')
-f_handler.setLevel(logging.DEBUG)
+#f_handler = logging.FileHandler('n2EncoderDecoder.log', 'a')
+#f_handler.setLevel(logging.DEBUG)
 # Create formatters and add it to handlers
-f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-f_handler.setFormatter(f_format)
+#f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#f_handler.setFormatter(f_format)
 # Add handlers to the logger
-logger.addHandler(f_handler)
+#logger.addHandler(f_handler)
 
 
 def test():
@@ -936,7 +938,7 @@ class N2Decoder:
         Supported message types:
         PDU_SESS_RSRC_SETUP_REQ
         PDU_SESS_RSRC_SETUP_RSP
-        PDU_SESS_RSRC_REL_RESP
+        PATH_SW_REQ
 
         """
         help_flag = 0
@@ -964,6 +966,13 @@ class N2Decoder:
                 ret = self.encode_PduSessionResourceSetupResponseTransfer(**kwargs)
             else:
                 print(self.encode_PduSessionResourceSetupResponseTransfer.__doc__)
+                return 0
+
+        elif msg_to_encode == 'PATH_SW_REQ':
+            if help_flag != 1:
+                ret = self.encode_PathSwithRequestTransfer(**kwargs)
+            else:
+                print(self.encode_PathSwithRequestTransfer.__doc__)
                 return 0
         else:
             logger.error(f"msg_type {msg_to_encode} is undefined")
@@ -1225,13 +1234,17 @@ class N2Decoder:
             return ret
 
 
+    def encode_UPTransportLayerInformation(self, addr, teid):
+        "Return a tuple with Up Transport information"
+        teid = unhexlify(teid)
+        return ('UPTransportLayerInformation', 
+                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 160), 'gTP-TEID': teid }))})
 
 
-
-    def encode_PduSessionResourceReleaseResponseTransfer(self, **kwargs):
+    def encode_PathSwithRequestTransfer(self, **kwargs):
         """
-        Pass values to encode PDU Session Rsrc Setup Respone and return a hex stream
-
+        Pass values to encode Path Switch Request and return a hex stream
+        PATH_SW_REQ
         Keys/Args:
 
         qos_per_tunn  -
@@ -1239,91 +1252,181 @@ class N2Decoder:
         """
 
         self.debug          = kwargs['debug']           if 'debug'          in kwargs else None
-        self.qos_per_tunn   = kwargs['qos_per_tunn']    if 'qos_per_tunn'   in kwargs else None
+        self.up_transport   = kwargs['up_transport']    if 'up_transport'   in kwargs else None
+        self.tnl_info_reuse = kwargs['tnl_info_reuse']  if 'tnl_info_reuse' in kwargs else None
+        self.user_plane_sec = kwargs['user_plane_sec']  if 'user_plane_sec' in kwargs else None
+        self.qos_flow_accept = kwargs['qos_flow_accept'] if 'qos_flow_accept' in kwargs else None
 
-        encodePSRRelRespTransfer = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
+        encodePathSwitchReqTransfer = NGAP_DEC.NGAP_IEs.PathSwitchRequestTransfer
 
         if self.debug ==  'true':
-            logger.debug(encodePSRRelRespTransfer._cont)
-            logger.debug(encodePSRRelRespTransfer.get_proto())
+            logger.debug(encodePathSwitchReqTransfer._cont)
+            logger.debug(encodePathSwitchReqTransfer.get_proto())
         """
         {
-        qosFlowPerTNLInformation: <qosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>,
-        additionalQosFlowPerTNLInformation: <additionalQosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>,
-        securityResult: <securityResult ([SecurityResult] SEQUENCE)>,
-        qosFlowFailedToSetupList: <qosFlowFailedToSetupList ([QosFlowList] SEQUENCE OF)>,
+        dL-NGU-UP-TNLInformation: <dL-NGU-UP-TNLInformation ([UPTransportLayerInformation] CHOICE)>,
+        dL-NGU-TNLInformationReused: <dL-NGU-TNLInformationReused ([DL-NGU-TNLInformationReused] ENUMERATED)>,
+        userPlaneSecurityInformation: < ([UserPlaneSecurityInformation] SEQUENCE)>,
+        qosFlowAcceptedList: <qosFlowAcceptedList ([QosFlowAcceptedList] SEQUENCE OF)>,
         iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
         }
 
         IEs.asn
-        PDUSessionResourceSetupResponseTransfer ::= SEQUENCE {
-            qosFlowPerTNLInformation				QosFlowPerTNLInformation,
-            additionalQosFlowPerTNLInformation		QosFlowPerTNLInformation											OPTIONAL,
-            securityResult							SecurityResult														OPTIONAL,
-            qosFlowFailedToSetupList				QosFlowList															OPTIONAL,
-            iE-Extensions		ProtocolExtensionContainer { {PDUSessionResourceSetupResponseTransfer-ExtIEs} }		OPTIONAL,
+        PathSwitchRequestTransfer ::= SEQUENCE {
+        dL-NGU-UP-TNLInformation			UPTransportLayerInformation,
+        dL-NGU-TNLInformationReused			DL-NGU-TNLInformationReused							OPTIONAL,
+        userPlaneSecurityInformation		UserPlaneSecurityInformation						OPTIONAL,
+        qosFlowAcceptedList					QosFlowAcceptedList,
+        iE-Extensions		ProtocolExtensionContainer { {PathSwitchRequestTransfer-ExtIEs} }	OPTIONAL,
+        ...
+        }
+
+        IntegrityProtectionIndication ::= ENUMERATED {
+            required,
+            preferred,
+            not-needed,
+            ...
+        }
+        ConfidentialityProtectionIndication ::= ENUMERATED {
+            required,
+            preferred,
+            not-needed,
+            ...
+        }
+
+        MaximumIntegrityProtectedDataRate ::= ENUMERATED {
+            bitrate64kbs,
+            maximum-UE-rate,
             ...
         }
         """
 
         IEs = {} # let's build the list of IEs values
 
-        if self.qos_per_tunn is not None:
-            addr = self.qos_per_tunn["1"]
-            teid = unhexlify(self.qos_per_tunn["2"])
-            qfi = int(self.qos_per_tunn["3"])
+        if self.up_transport is not None:
+            addr = self.up_transport["1"]
+            upTransport = encode_UPTransportLayerInformation(self.addr, self.up_transport[2])
             #IEs = {'qosFlowPerTNLInformation': {'uPTransportLayerInformation': 
             #        ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}}
-            IEs['qosFlowPerTNLInformation'] = {'uPTransportLayerInformation': 
-                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}
+            IEs['dL-NGU-UP-TNLInformation'] = {'uPTransportLayerInformation': 
+                    upTransport }
             #debugger.set_trace()
+        else:
+            logger.error("Up Transport information is mandatory")
+            return 0
 
-        if self.addn_qos_tunn is not None:
-            addr = self.addn_qos_tunn["1"]
-            teid = unhexlify(self.addn_qos_tunn["2"])
-            qfi = int(self.addn_qos_tunn["3"])
-            IEs['additionalQosFlowPerTNLInformation'] = {'uPTransportLayerInformation': 
-                    ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}
-            #debugger.set_trace()
+        if self.tnl_info_reuse is not None:
+            IEs['dL-NGU-TNLInformationReused'] = "true"
 
-        if self.sec_result is not None:
-            ip_result   = self.sec_result["1"]
-            conf_result = self.sec_result["2"]
-            IEs['securityResult'] = {'integrityProtectionResult': ip_result, 'confidentialityProtectionResult': conf_result}
+        if self.user_plane_sec is not None:
+            self.int_prot_result = self.user_plane_sec["1"]
+            self.conf_prot_result = self.user_plane_sec["2"]
+            self.int_prot_indication = self.user_plane_sec["3"]
+            self.conf_prot_indication = self.user_plane_sec["4"]
+            self.max_int_prot_data = self.user_plane_sec["5"]  if "5" in user_plane_sec else None
 
-        #9.3.1.13 38.413
-        if self.qos_failed_lst is not None:
+            IEs['userPlaneSecurityInformation'] = encode_user_plane_sec_info(self.int_prot_result, 
+                self.conf_prot_result, self.int_prot_indication, self.conf_prot_indication, 
+                'max_int_prot_data' = self.max_int_prot_data)
+
+        if self.qos_flow_accept is not None:
             tmp = []
-            #it is a list of { QFI, cause}, only nas cause supported
-            for flow_item in self.qos_failed_lst:
-                tmp.append( {'qosFlowIdentifier': int(flow_item["1"]), 'cause': ('nas', flow_item["2"]) })
+            #it is a list of { QFI }
+            for qos in self.qos_flow_accept:
+                tmp.append( {'qosFlowIdentifier': int(qos)} )
 
-            IEs['qosFlowFailedToSetupList'] = tmp
+            IEs['qosFlowAcceptedList'] = tmp
+        else:
+            logger.error("Accepted list of QOS is mandatory")
+            return 0
 
 
         try:
-            encodePSRSRespTransfer.set_val(IEs)
+            encodePathSwitchReqTransfer.set_val(IEs)
         except:
-            logger.exception("Error setting values for PDU Sess Setup Resp Transfer")
+            logger.exception("Error setting values for Path Switch Request Transfer")
             logger.debug(f"Array: {IEs}")
             return 0
 
         try:
-            ret = hexlify(encodePSRSRespTransfer.to_aper())
+            ret = hexlify(encodePathSwitchReqTransfer.to_aper())
             if self.debug == 'true':
-                print(hexlify(encodePSRSRespTransfer.to_aper()))
+                print(hexlify(encodePathSwitchReqTransfer.to_aper()))
 
         except:
-            logger.exception("Tried Encoding PDU Sess Setup Resp Transfer")
+            logger.exception("Tried Encoding Path Switch Request Transfer")
         else:
             return ret
 
 
 
+    def encode_user_plane_sec_info(self, int_prot_result, conf_prot_result,
+            int_prot_indication, conf_prot_indication, **kwargs):
+        """
+        User Plane Security information.
+        Has security result and security indication
+        """
+        max_int_prot_data = kwargs['max_int_prot_data'] if 'max_int_prot_data' in kwargs else None
+        
+        IEs['securityResult'] = self.encode_security_result(int_prot_result, conf_prot_result)
+        IEs['securityIndication'] = self.encode_security_indication(int_prot_indication, 
+                                conf_prot_indication, 'max_int_prot_data' = max_int_prot_data)
+
+
+    def encode_security_result(self, int_prot_result, conf_prot_result):
+        """
+        Encode Security Result
+        IntegrityProtectionResult ::= ENUMERATED {
+            performed,
+            not-performed,
+            ...
+        }
+        ConfidentialityProtectionResult ::= ENUMERATED {
+            performed,
+            not-performed,
+            ...
+        }
+        """
+        IEs['integrityProtectionResult'] = int_prot_result, 
+        IEs['confidentialityProtectionResult'] = conf_prot_result
+        return IEs
+
+
+    def encode_security_indication(self, int_prot_indication, conf_prot_indication, **kwargs):
+        """
+        IntegrityProtectionIndication ::= ENUMERATED {
+            required,
+            preferred,
+            not-needed,
+            ...
+        }
+        ConfidentialityProtectionIndication ::= ENUMERATED {
+            required,
+            preferred,
+            not-needed,
+            ...
+        }
+        MaximumIntegrityProtectedDataRate ::= ENUMERATED {
+            bitrate64kbs,
+            maximum-UE-rate,
+            ...
+        }
+        """
+        ret_val = {'integrityProtectionIndication': int_prot_indication,
+                    'confidentialityProtectionIndication': conf_prot_indication }
+        if max_int_prot_data is in kwargs:
+            ret_val['maximumIntegrityProtectedDataRate'] = kwargs['max_int_prot_data']
+
+        return ret_val
 
 
 
-if __name__ ==  "__main__" :    
+if __name__ ==  "__main__" :
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    s_handler = logging.StreamHandler(sys.stdout)
+    s_handler.setLevel(logging.DEBUG)
+    logger.addHandler(s_handler) 
     #test()
     #testPcch()
     #encode_PduSessionResourceSetupRequestTransfer_2()
@@ -1348,3 +1451,6 @@ if __name__ ==  "__main__" :
 
     #n2Obj.encode_PduSessionResourceSetupResponseTransfer( qos_per_tunn = ( '101124353', '10000001', 5 ), sec_result = ('performed','performed'), qos_failed_lst = [('5', 'deregister'), ('6', 'normal-release')])
     #3003e00607090110000001000500102a406400
+
+    n2DecodeObj =N2Decoder()
+    n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
