@@ -1334,7 +1334,6 @@ class N2Decoder:
         except:
             logger.exception("Error setting values for Path Switch Request Transfer")
             logger.debug(f"Array: {IEs}")
-            debugger.set_trace()
             return 0
 
         try:
@@ -1347,6 +1346,145 @@ class N2Decoder:
         else:
             return ret
 
+
+    def encode_HandoverReqAckTransfer(self, **kwargs):
+        """
+        Pass values to encode handover request Acknowledge and return a hex stream
+            HANDOVER_REQ_ACK
+        """
+
+        self.debug              = kwargs['debug']            if 'debug'            in kwargs else None
+        self.up_transport       = kwargs['up_transport']     if 'up_transport'     in kwargs else None
+        self.dl_fwd_tunn_info   = kwargs['dl_fwd_tunn_info'] if 'dl_fwd_tunn_info' in kwargs else None
+        self.sec_result         = kwargs['sec_result']       if 'sec_result'       in kwargs else None
+        self.qos_flow_setup     = kwargs['qos_flow_setup']   if 'qos_flow_setup'   in kwargs else None
+        self.qos_failed_lst     = kwargs['qos_failed_lst']   if 'qos_failed_lst'   in kwargs else None
+        self.data_fw_rsp        = kwargs['data_fw_rsp']      if 'data_fw_rsp'      in kwargs else None
+
+        encodeHandoverReqAckTransfer = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodeHandoverReqAckTransfer._cont)
+            logger.debug(encodeHandoverReqAckTransfer.get_proto())
+        """
+        {
+        dL-NGU-UP-TNLInformation: <dL-NGU-UP-TNLInformation ([UPTransportLayerInformation] CHOICE)>,
+        dLForwardingUP-TNLInformation: <dLForwardingUP-TNLInformation ([UPTransportLayerInformation] CHOICE)>,
+        securityResult: <securityResult ([SecurityResult] SEQUENCE)>,
+        qosFlowSetupResponseList: <qosFlowSetupResponseList ([QosFlowSetupResponseListHOReqAck] SEQUENCE OF)>,
+        qosFlowFailedToSetupList: <qosFlowFailedToSetupList ([QosFlowList] SEQUENCE OF)>,
+        dataForwardingResponseDRBList: <dataForwardingResponseDRBList ([DataForwardingResponseDRBList] SEQUENCE OF)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+
+        HandoverRequestAcknowledgeTransfer ::= SEQUENCE {
+        dL-NGU-UP-TNLInformation			UPTransportLayerInformation,
+        dLForwardingUP-TNLInformation		UPTransportLayerInformation										OPTIONAL,
+        securityResult						SecurityResult													OPTIONAL,
+        qosFlowSetupResponseList			QosFlowSetupResponseListHOReqAck,
+        qosFlowFailedToSetupList			QosFlowList														OPTIONAL,
+        dataForwardingResponseDRBList		DataForwardingResponseDRBList									OPTIONAL,
+        iE-Extensions		ProtocolExtensionContainer { {HandoverRequestAcknowledgeTransfer-ExtIEs} }	OPTIONAL,
+        ...
+        }
+        """
+        IEs = {} # let's build the list of IEs values
+
+        if self.up_transport is not None:
+            self.addr = self.up_transport["1"]
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"])
+            IEs['dL-NGU-UP-TNLInformation'] = upTransport
+            #debugger.set_trace()
+        else:
+            logger.error("Up Transport information is mandatory")
+            return 0
+
+        if self.dl_fwd_tunn_info is not None:
+            self.addr = self.dl_fwd_tunn_info["1"]
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_fwd_tunn_info["2"])
+            IEs['dLForwardingUP-TNLInformation'] = upTransport
+            #debugger.set_trace()
+
+        if self.sec_result is not None:
+            IEs['securityResult'] = self.encode_security_result(self.sec_result["1"], self.sec_result["2"])
+
+        if self.qos_flow_setup is not None:
+            tmp = []
+            #it is a list of { QFI, dataFwdAccepted}
+            for entry in self.qos_flow_setup:
+                tmp_dict = {}
+                tmp_dict['qosFlowIdentifier'] = int(entry["qos"])
+                if 'dataFwdAccept' in entry:
+                    tmp_dict['dataForwardingAccepted'] = 'data-forwarding-accepted'
+                
+                tmp.append(tmp_dict)
+
+            IEs['qosFlowSetupResponseList'] = tmp
+        else:
+            logger.error("Qos Flow Setup response list is mandatory")
+            return 0
+
+        if self.qos_failed_lst is not None:
+            IEs['qosFlowFailedToSetupList'] = self.encode_QosList(self.qos_failed_lst)
+
+        if self.data_fw_rsp is not None:
+            IEs['dataForwardingResponseDRBList'] = self.encode_dataFwdDrbList(self.data_fw_rsp)
+
+        try:
+            encodeHandoverReqAckTransfer.set_val(IEs)
+        except:
+            logger.exception("Error setting values for Handover Request Ack Transfer")
+            logger.debug(f"Array: {IEs}")
+            debugger.set_trace()
+            return 0
+
+        try:
+            ret = hexlify(encodeHandoverReqAckTransfer.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodeHandoverReqAckTransfer.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding Handover Request Ack Transfer")
+        else:
+            return ret
+
+
+    
+
+    def encode_dataFwdDrbList(self, list_of_data_fwd_drb):
+        """
+        SEQUENCE (SIZE(1..maxnoofDRBs)) OF DataForwardingResponseDRBItem
+        """
+        tmp = []
+        #it is a list of { ID, UPTransportLayerInformation, UPTransportLayerInformation}
+        for item in list_of_data_fwd_drb:
+            tmp_dict = {}
+            tmp_dict['dRB-ID'] = int(item["id"])
+
+            if 'dl_tunn_info' in item:
+                tmp_lst_tunn_info = item['dl_tunn_info']
+                tmp_dict['dLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], tmp_lst_tunn_info["2"])
+            
+            if 'ul_tunn_info' in item:
+                tmp_lst_tunn_info = item['ul_tunn_info']
+                tmp_dict['uLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], tmp_lst_tunn_info["2"])
+            
+            tmp.append(tmp_dict)
+
+        return tmp
+
+
+
+    def encode_QosList(self, list_of_qfi_cause):
+        """
+        Input is a list of QFI and Cause pairs.
+        Only NAS cause is supported
+        """
+        tmp = []
+        for flow_item in list_of_qfi_cause:
+            tmp.append( {'qosFlowIdentifier': int(flow_item["qfi"]), 'cause': ('nas', flow_item["cause"]) })
+
+        return tmp
 
 
     def encode_UPTransportLayerInformation(self, addr, teid):
@@ -1451,4 +1589,5 @@ if __name__ ==  "__main__" :
     #3003e00607090110000001000500102a406400
 
     n2DecodeObj =N2Decoder()
-    n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
+    #n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
+    n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
