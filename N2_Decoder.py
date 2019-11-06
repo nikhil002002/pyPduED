@@ -283,24 +283,24 @@ class N2Decoder2:
             PDU_SESS_RSRC_SETUP_REQ
             PDU_SESS_RSRC_SETUP_RSP
             PDU_SESS_RSRC_MOD_REQ
-            PDU_SESS_RSRC_MOD_RSP
-            PDU_SESS_RSRC_NOTF
-            PDU_SESS_RSRC_MOD_IND
+            PDU_SESS_RSRC_MOD_RSP#
+            PDU_SESS_RSRC_NOTF#
+            PDU_SESS_RSRC_MOD_IND#
             PDU_SESS_RSRC_MOD_CONF
             PATH_SW_REQ
             PATH_SW_REQ_ACK
             HANDOVER_CMD
-            HANDOVER_REQ_ACK
+            HANDOVER_REQ_ACK#
             PDU_SESS_RSRC_REL_CMD
             PDU_SESS_RSRC_NOTF_REL
-            HANDOVER_REQIRED
+            HANDOVER_REQUIRED#
             PATH_SW_REQ_SETUP_FAIL
             PDU_SESS_RSRC_SETUP_UNSUCESS
             PDU_SESS_RSRC_MOD_UNSUCESS
             HANDOVER_PREP_UNSUCESS
             HANDOVER_RSRC_ALLOC_UNSUCESS
             PATH_SW_REQ_UNSUCESS
-            PDU_SESS_RSRC_REL_RESP
+            PDU_SESS_RSRC_REL_RESP#
         """
 
         if 'msg_type' in kwargs and 'hex' in kwargs:
@@ -354,7 +354,7 @@ class N2Decoder2:
         elif msg_to_decode == 'PDU_SESS_RSRC_NOTF_REL':
             ret = self.decode_PduSessionResourceNotifyReleasedTransfer(hex_ip)
 
-        elif msg_to_decode == 'HANDOVER_REQIRED':
+        elif msg_to_decode == 'HANDOVER_REQUIRED':
             ret = self.decode_HandoverRequiredTransfer(hex_ip)
 
         elif msg_to_decode == 'PATH_SW_REQ_SETUP_FAIL':
@@ -1449,6 +1449,26 @@ class N2Decoder:
             return ret
 
 
+            #HANDOVER_PREP_UNSUCESS
+    def encode_HandoverPreparationUnsuccessfulTransfer(self, **kwargs):
+        """
+        Pass values to encode handover request Acknowledge and return a hex stream
+            HANDOVER_REQ_ACK
+        """
+
+        self.debug              = kwargs['debug']            if 'debug'            in kwargs else None
+        self.up_transport       = kwargs['up_transport']     if 'up_transport'     in kwargs else None
+        self.dl_fwd_tunn_info   = kwargs['dl_fwd_tunn_info'] if 'dl_fwd_tunn_info' in kwargs else None
+        self.sec_result         = kwargs['sec_result']       if 'sec_result'       in kwargs else None
+        self.qos_flow_setup     = kwargs['qos_flow_setup']   if 'qos_flow_setup'   in kwargs else None
+        self.qos_failed_lst     = kwargs['qos_failed_lst']   if 'qos_failed_lst'   in kwargs else None
+        self.data_fw_rsp        = kwargs['data_fw_rsp']      if 'data_fw_rsp'      in kwargs else None
+
+        encodeHandoverReqAckTransfer = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodeHandoverReqAckTransfer._cont)
+            logger.debug(encodeHandoverReqAckTransfer.get_proto())
     
 
     def encode_dataFwdDrbList(self, list_of_data_fwd_drb):
@@ -1556,6 +1576,14 @@ class N2Decoder:
         return ret_val
 
 
+            #HANDOVER_REQUIRED
+            #HANDOVER_RSRC_ALLOC_UNSUCESS
+            
+            #PDU_SESS_RSRC_MOD_RSP#
+            #PDU_SESS_RSRC_NOTF#
+            #PDU_SESS_RSRC_MOD_IND#
+            #HANDOVER_REQ_ACK#
+            #PDU_SESS_RSRC_REL_RESP#
 
 if __name__ ==  "__main__" :
     logger = logging.getLogger(__name__)
