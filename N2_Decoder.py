@@ -939,7 +939,7 @@ class N2Decoder:
         PDU_SESS_RSRC_SETUP_REQ
         PDU_SESS_RSRC_SETUP_RSP
         PATH_SW_REQ
-
+        HANDOVER_REQ_ACK
         HANDOVER_PREP_UNSUCESS
         """
         help_flag = 0
@@ -974,6 +974,13 @@ class N2Decoder:
                 ret = self.encode_PathSwithRequestTransfer(**kwargs)
             else:
                 print(self.encode_PathSwithRequestTransfer.__doc__)
+                return 0
+
+        elif msg_to_encode == 'HANDOVER_REQ_ACK':
+            if help_flag != 1:
+                ret = self.encode_HandoverReqAckTransfer(**kwargs)
+            else:
+                print(self.encode_HandoverReqAckTransfer.__doc__)
                 return 0
 
         elif msg_to_encode == 'HANDOVER_PREP_UNSUCESS':
@@ -1507,7 +1514,6 @@ class N2Decoder:
         except:
             logger.exception("Error setting values for Handover Perparation Unsuccessful Transfer")
             logger.debug(f"Array: {IEs}")
-            debugger.set_trace()
             return 0
 
         try:
@@ -1554,7 +1560,7 @@ class N2Decoder:
         """
         tmp = []
         for flow_item in list_of_qfi_cause:
-            cause_tuple = self.encode_CauseValue(flow_item["cause_type"], flow_item['cause_value'])
+            cause_tuple = self.encode_CauseValue(flow_item["cause_type"], flow_item["cause_value"])
             tmp.append( {'qosFlowIdentifier': int(flow_item["qfi"]), 'cause': cause_tuple })
 
         return tmp
