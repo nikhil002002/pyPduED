@@ -1,0 +1,8 @@
+{
+    "msg_type" : "HANDOVER_PREP_UNSUCESS",
+    "cause" : {
+        "type" : "nas", 
+        "value" : "deregister"
+    }
+}
+

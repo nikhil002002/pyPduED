@@ -940,6 +940,7 @@ class N2Decoder:
         PDU_SESS_RSRC_SETUP_RSP
         PATH_SW_REQ
 
+        HANDOVER_PREP_UNSUCESS
         """
         help_flag = 0
 
@@ -973,6 +974,13 @@ class N2Decoder:
                 ret = self.encode_PathSwithRequestTransfer(**kwargs)
             else:
                 print(self.encode_PathSwithRequestTransfer.__doc__)
+                return 0
+
+        elif msg_to_encode == 'HANDOVER_PREP_UNSUCESS':
+            if help_flag != 1:
+                ret = self.encode_HandoverPreparationUnsuccessfulTransfer(**kwargs)
+            else:
+                print(self.encode_HandoverPreparationUnsuccessfulTransfer.__doc__)
                 return 0
         else:
             logger.error(f"msg_type {msg_to_encode} is undefined")
@@ -1449,27 +1457,71 @@ class N2Decoder:
             return ret
 
 
-            #HANDOVER_PREP_UNSUCESS
+
     def encode_HandoverPreparationUnsuccessfulTransfer(self, **kwargs):
         """
-        Pass values to encode handover request Acknowledge and return a hex stream
-            HANDOVER_REQ_ACK
+        Pass values to encode handover Perparation Unsuccessful Transfer and 
+        return a hex stream
+        HANDOVER_PREP_UNSUCESS
+
+        cause -  Dict is of type
+                    {"type": type is one of radioNetwork/transport/nas/protocol/misc
+                    "value": for the strings that can be used here,
+                            check ASN1 spec for below ENUMS
+                            CauseRadioNetwork,	CauseTransport, 
+                            CauseNas, CauseProtocol, CauseMisc}
         """
 
-        self.debug              = kwargs['debug']            if 'debug'            in kwargs else None
-        self.up_transport       = kwargs['up_transport']     if 'up_transport'     in kwargs else None
-        self.dl_fwd_tunn_info   = kwargs['dl_fwd_tunn_info'] if 'dl_fwd_tunn_info' in kwargs else None
-        self.sec_result         = kwargs['sec_result']       if 'sec_result'       in kwargs else None
-        self.qos_flow_setup     = kwargs['qos_flow_setup']   if 'qos_flow_setup'   in kwargs else None
-        self.qos_failed_lst     = kwargs['qos_failed_lst']   if 'qos_failed_lst'   in kwargs else None
-        self.data_fw_rsp        = kwargs['data_fw_rsp']      if 'data_fw_rsp'      in kwargs else None
+        self.debug      = kwargs['debug']     if 'debug'     in kwargs else None
+        self.cause      = kwargs['cause']     if 'cause'     in kwargs else None
 
-        encodeHandoverReqAckTransfer = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
+        encodeHandoverPrepUnsuccessTrnf = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
 
         if self.debug ==  'true':
-            logger.debug(encodeHandoverReqAckTransfer._cont)
-            logger.debug(encodeHandoverReqAckTransfer.get_proto())
+            logger.debug(encodeHandoverPrepUnsuccessTrnf._cont)
+            logger.debug(encodeHandoverPrepUnsuccessTrnf.get_proto())
+        """
+        {
+        cause: <cause ([Cause] CHOICE)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+        HandoverPreparationUnsuccessfulTransfer ::= SEQUENCE {
+            cause				Cause,
+            iE-Extensions		ProtocolExtensionContainer { {HandoverPreparationUnsuccessfulTransfer-ExtIEs} }	OPTIONAL,
+            ...
+        }
+        """
+        IEs = {} # let's build the list of IEs values
+
+        if self.cause is not None:
+            self.cause_type = self.cause["type"]
+            self.cause_val = self.cause["value"]
+            IEs['cause'] = self.encode_CauseValue(self.cause_type,self.cause_val)
+        else:
+            logger.error("Cause field mandatory for Handover prep Unsuccessful Tansfer")
+            return 0
+
+
+        try:
+            encodeHandoverPrepUnsuccessTrnf.set_val(IEs)
+        except:
+            logger.exception("Error setting values for Handover Perparation Unsuccessful Transfer")
+            logger.debug(f"Array: {IEs}")
+            debugger.set_trace()
+            return 0
+
+        try:
+            ret = hexlify(encodeHandoverPrepUnsuccessTrnf.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodeHandoverPrepUnsuccessTrnf.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding Handover Prep Unsuccessful Transfer")
+        else:
+            return ret
     
+
+
 
     def encode_dataFwdDrbList(self, list_of_data_fwd_drb):
         """
@@ -1498,11 +1550,12 @@ class N2Decoder:
     def encode_QosList(self, list_of_qfi_cause):
         """
         Input is a list of QFI and Cause pairs.
-        Only NAS cause is supported
+        { "qfi" : <value>, "cause_type": <nas, misc...>, "cause_value": <>}
         """
         tmp = []
         for flow_item in list_of_qfi_cause:
-            tmp.append( {'qosFlowIdentifier': int(flow_item["qfi"]), 'cause': ('nas', flow_item["cause"]) })
+            cause_tuple = self.encode_CauseValue(flow_item["cause_type"], flow_item['cause_value'])
+            tmp.append( {'qosFlowIdentifier': int(flow_item["qfi"]), 'cause': cause_tuple })
 
         return tmp
 
@@ -1576,6 +1629,19 @@ class N2Decoder:
         return ret_val
 
 
+    def encode_CauseValue(self, cause_type, cause_str):
+        """
+            Return a tuple with cause
+            cause_type can be anyone of the column1 below
+            for values, refer to ASN spec and grep for corresponding fields in column2
+            	radioNetwork		CauseRadioNetwork,
+                transport			CauseTransport,
+                nas					CauseNas,
+                protocol			CauseProtocol,
+                misc				CauseMisc,
+        """
+        return (cause_type, cause_str)
+
             #HANDOVER_REQUIRED
             #HANDOVER_RSRC_ALLOC_UNSUCESS
             
@@ -1618,4 +1684,5 @@ if __name__ ==  "__main__" :
 
     n2DecodeObj =N2Decoder()
     #n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
-    n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
+    #n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
+    #n2DecodeObj.encode_HandoverPreparationUnsuccessfulTransfer(debug='true')
