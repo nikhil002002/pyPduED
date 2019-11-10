@@ -1429,6 +1429,31 @@ class N2Decoder:
         """
         Pass values to encode handover request Acknowledge and return a hex stream
             HANDOVER_REQ_ACK
+        Keys/Args:
+
+        up_transport -  Dict is of type
+                    {"1": <address as bit string>, "2": <TEID without0x>}
+        dl_fwd_tunn_info -  Dict is of type
+                    {"1": <address as bit string>, "2": <TEID without0x>}
+        sec_result - Dict is of type
+                    { "1" - Integrity Protection result,
+                      "2" - Confidentiality Protection result,
+                      }
+                      possible values: performed / not-performed
+        qos_flow_setup: dict is a list of dicts
+            [ { "qos": <value>, "dataFwdAccept": <This key value is optional>} ]
+        qos_failed_lst: Dict is of type
+            {"qfi": <>, "cause_type": <>, "cause_value": <>}
+                type is one of radioNetwork/transport/nas/protocol/misc
+                for value that can be used here,
+                    check ASN1 spec for below ENUMS
+                    CauseRadioNetwork,	CauseTransport, 
+                    CauseNas, CauseProtocol, CauseMisc}
+        data_fw_rsp: it is alist if Dicts of type
+            [ {"id": <>, 
+                "dl_tunn_info": <is a dict of like up_transport>, 
+                "ul_tunn_info": <is a dict of like up_transport>}
+            ]
         """
 
         self.debug              = kwargs['debug']            if 'debug'            in kwargs else None
@@ -1526,6 +1551,48 @@ class N2Decoder:
         else:
             return ret
 
+
+
+
+    def encode_HandoverResourceAllocUnsucessful(self, **kwargs):
+        """
+        Pass values to encode handover request Acknowledge and return a hex stream
+        HANDOVER_RSRC_ALLOC_UNSUCESS
+        """
+
+        self.debug      = kwargs['debug']     if 'debug'     in kwargs else None
+        self.cause      = kwargs['cause']     if 'cause'     in kwargs else None
+        self.crit_dia   = kwargs['cause']     if 'crit_diag' in kwargs else None
+
+        encodeHandoverRsrcAllocUnsucess = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodeHandoverRsrcAllocUnsucess._cont)
+            logger.debug(encodeHandoverRsrcAllocUnsucess.get_proto())
+        """
+        {
+        cause: <cause ([Cause] CHOICE)>,
+        criticalityDiagnostics: <criticalityDiagnostics ([CriticalityDiagnostics] SEQUENCE)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+
+        HandoverResourceAllocationUnsuccessfulTransfer ::= SEQUENCE {
+            cause						Cause,
+            criticalityDiagnostics		CriticalityDiagnostics																	OPTIONAL,
+            iE-Extensions		ProtocolExtensionContainer { {HandoverResourceAllocationUnsuccessfulTransfer-ExtIEs} }	OPTIONAL,
+            ...
+        }
+
+        """
+        IEs = {} # let's build the list of IEs values
+
+        if self.cause is not None:
+            self.cause_type = self.cause["type"]
+            self.cause_val = self.cause["value"]
+            IEs['cause'] = self.encode_CauseValue(self.cause_type,self.cause_val)
+        else:
+            logger.error("Cause field mandatory for Handover prep Unsuccessful Tansfer")
+            return 0
 
 
     def encode_HandoverPreparationUnsuccessfulTransfer(self, **kwargs):
@@ -1711,8 +1778,35 @@ class N2Decoder:
         """
         return (cause_type, cause_str)
 
-            #HANDOVER_RSRC_ALLOC_UNSUCESS
-            
+    
+    def encode_criticality_diagnostics(self, procedure_code, trigger_msg,
+        procedure_crit, list_of_crit_diag, **kwargs):
+        """
+        procedure_code 0-255
+        triggering Message: initiating-message, successful-outcome, unsuccessfull-outcome
+        procedureCriticality: reject, ignore, notify
+
+        ie-Id 0..65535
+        typeOfError	not-understood,	missing
+        """
+        IEs = {}
+
+        IEs['procedureCode']     = int(procedure_code)
+        IEs['triggeringMessage'] = trigger_msg
+        IEs['procedureCriticality'] = procedure_crit
+        tmp = []
+        for item in list_of_crit_diag:
+            tmp.append( 
+                {'iECriticality': item['criticality'], 
+                'iE-ID': item['id'],
+                'typeOfError': item['error_type']
+                 })
+
+        IEs['iEsCriticalityDiagnostics'] = tmp
+
+        return IEs
+
+        
             #PDU_SESS_RSRC_MOD_RSP#
             #PDU_SESS_RSRC_NOTF#
             #PDU_SESS_RSRC_MOD_IND#
@@ -1754,4 +1848,5 @@ if __name__ ==  "__main__" :
     #n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
     #n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
     #n2DecodeObj.encode_HandoverPreparationUnsuccessfulTransfer(debug='true')
-    n2DecodeObj.encode_HandoverRequiredTransfer(debug= 'true')
+    #n2DecodeObj.encode_HandoverRequiredTransfer(debug= 'true')
+    n2DecodeObj.encode_HandoverResourceAllocUnsucessful(debug='true')
