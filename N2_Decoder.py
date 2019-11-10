@@ -983,6 +983,13 @@ class N2Decoder:
                 print(self.encode_HandoverReqAckTransfer.__doc__)
                 return 0
 
+        elif msg_to_encode == 'HANDOVER_REQUIRED':
+            if help_flag != 1:
+                ret = self.encode_HandoverRequiredTransfer(**kwargs)
+            else:
+                print(self.encode_HandoverRequiredTransfer.__doc__)
+                return 0
+
         elif msg_to_encode == 'HANDOVER_PREP_UNSUCESS':
             if help_flag != 1:
                 ret = self.encode_HandoverPreparationUnsuccessfulTransfer(**kwargs)
@@ -1362,6 +1369,62 @@ class N2Decoder:
             return ret
 
 
+    def encode_HandoverRequiredTransfer(self, **kwargs):
+        """
+        Pass values to encode handover Required Transfer and return a hex stream
+            HANDOVER_REQUIRED
+        Keys/Args:
+
+        direct_fwd_avail -  true/any value sets IE to direct-path-available
+        """
+
+        self.debug            = kwargs['debug']            if 'debug'            in kwargs else None
+        self.direct_fwd_avail = kwargs['direct_fwd_avail'] if 'direct_fwd_avail' in kwargs else None
+
+        encodeHandoverRequired = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodeHandoverRequired._cont)
+            logger.debug(encodeHandoverRequired.get_proto())
+
+        """
+        {
+        directForwardingPathAvailability: <directForwardingPathAvailability ([DirectForwardingPathAvailability] ENUMERATED)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+        HandoverRequiredTransfer ::= SEQUENCE {
+            directForwardingPathAvailability		DirectForwardingPathAvailability				OPTIONAL,
+            iE-Extensions		ProtocolExtensionContainer { {HandoverRequiredTransfer-ExtIEs} }	OPTIONAL,
+            ...
+        """
+        
+        IEs = {} # let's build the list of IEs values
+
+        if self.direct_fwd_avail is not None:
+            IEs['directForwardingPathAvailability'] = 'direct-path-available'
+            #debugger.set_trace()
+        else:
+            logger.error("Direct forwarding path availabilty is the only IE so must be present")
+            return 0
+
+        try:
+            encodeHandoverRequired.set_val(IEs)
+        except:
+            logger.exception("Error setting values for Path Switch Request Transfer")
+            logger.debug(f"Array: {IEs}")
+            return 0
+
+        try:
+            ret = hexlify(encodeHandoverRequired.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodeHandoverRequired.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding Handover Required Transfer")
+        else:
+            return ret
+
+
     def encode_HandoverReqAckTransfer(self, **kwargs):
         """
         Pass values to encode handover request Acknowledge and return a hex stream
@@ -1648,7 +1711,6 @@ class N2Decoder:
         """
         return (cause_type, cause_str)
 
-            #HANDOVER_REQUIRED
             #HANDOVER_RSRC_ALLOC_UNSUCESS
             
             #PDU_SESS_RSRC_MOD_RSP#
@@ -1692,3 +1754,4 @@ if __name__ ==  "__main__" :
     #n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
     #n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
     #n2DecodeObj.encode_HandoverPreparationUnsuccessfulTransfer(debug='true')
+    n2DecodeObj.encode_HandoverRequiredTransfer(debug= 'true')

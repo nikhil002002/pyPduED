@@ -1,0 +1,5 @@
+{
+    "msg_type" : "HANDOVER_REQUIRED",
+    "direct_fwd_avail" : "true"
+}
+
