@@ -996,6 +996,13 @@ class N2Decoder:
             else:
                 print(self.encode_HandoverPreparationUnsuccessfulTransfer.__doc__)
                 return 0
+
+        elif msg_to_encode == 'HANDOVER_RSRC_ALLOC_UNSUCESS':
+            if help_flag != 1:
+                ret = self.encode_HandoverResourceAllocUnsucessful(**kwargs)
+            else:
+                print(self.encode_HandoverResourceAllocUnsucessful.__doc__)
+                return 0
         else:
             logger.error(f"msg_type {msg_to_encode} is undefined")
             return 0
@@ -1558,11 +1565,34 @@ class N2Decoder:
         """
         Pass values to encode handover request Acknowledge and return a hex stream
         HANDOVER_RSRC_ALLOC_UNSUCESS
+        Keys/Args:
+
+        cause -  Dict is of type
+                    {"type": type is one of radioNetwork/transport/nas/protocol/misc
+                    "value": for the strings that can be used here,
+                            check ASN1 spec for below ENUMS
+                            CauseRadioNetwork,	CauseTransport, 
+                            CauseNas, CauseProtocol, CauseMisc}
+        crit_diag - Citicality Diagnositics Dict is of type
+                {  "1" : <procedure code.. int of range 0 -255>
+                   "2" : <Trigger message>
+                        Value can be
+                        initiating-message, successful-outcome, unsuccessfull-outcome
+                   "3" : <procedure Criticality>
+                        Value can be
+                        reject, ignore, notify           
+                   "4" : <criticality diag IE list>
+                        List of dicts of type
+                        [{'criticality' : <values can be as criticality above>,
+                          'id' : <into of range 0- 65535>,
+                          'error_type': <values can be not-understood/missing>
+                         }]
+                }
         """
 
         self.debug      = kwargs['debug']     if 'debug'     in kwargs else None
         self.cause      = kwargs['cause']     if 'cause'     in kwargs else None
-        self.crit_dia   = kwargs['cause']     if 'crit_diag' in kwargs else None
+        self.crit_diag  = kwargs['crit_diag'] if 'crit_diag' in kwargs else None
 
         encodeHandoverRsrcAllocUnsucess = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
 
@@ -1591,8 +1621,38 @@ class N2Decoder:
             self.cause_val = self.cause["value"]
             IEs['cause'] = self.encode_CauseValue(self.cause_type,self.cause_val)
         else:
-            logger.error("Cause field mandatory for Handover prep Unsuccessful Tansfer")
+            logger.error("Cause field mandatory for Handover Rsrc Alloc Unsuccessful Tansfer")
             return 0
+
+        if self.crit_diag is not None:
+            self.procedure_code = self.crit_diag["1"]
+            self.trigger_msg    = self.crit_diag["2"]
+            self.procedure_crit = self.crit_diag["3"]
+            self.list_of_crit_diag = self.crit_diag["4"]
+            IEs['criticalityDiagnostics'] = self.encode_criticality_diagnostics(self.procedure_code, 
+                self.trigger_msg, self.procedure_crit, self.list_of_crit_diag)
+        else:
+            logger.error("Cause field mandatory for Handover Rsrc Alloc Unsuccessful Tansfer")
+            return 0
+
+        try:
+            encodeHandoverRsrcAllocUnsucess.set_val(IEs)
+        except:
+            logger.exception("Error setting values for Handover Resoruce Alloc Unsuccess Transfer")
+            logger.debug(f"Array: {IEs}")
+            return 0
+
+        try:
+            ret = hexlify(encodeHandoverRsrcAllocUnsucess.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodeHandoverRsrcAllocUnsucess.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding Handover Resource Alloc Unsuccess Transfer")
+        else:
+            return ret
+
+
 
 
     def encode_HandoverPreparationUnsuccessfulTransfer(self, **kwargs):
@@ -1600,6 +1660,7 @@ class N2Decoder:
         Pass values to encode handover Perparation Unsuccessful Transfer and 
         return a hex stream
         HANDOVER_PREP_UNSUCESS
+        Keys/Args:
 
         cause -  Dict is of type
                     {"type": type is one of radioNetwork/transport/nas/protocol/misc
@@ -1806,7 +1867,7 @@ class N2Decoder:
 
         return IEs
 
-        
+
             #PDU_SESS_RSRC_MOD_RSP#
             #PDU_SESS_RSRC_NOTF#
             #PDU_SESS_RSRC_MOD_IND#

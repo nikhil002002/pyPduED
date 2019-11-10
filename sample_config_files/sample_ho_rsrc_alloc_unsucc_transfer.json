@@ -1,0 +1,25 @@
+{
+    "msg_type" : "HANDOVER_RSRC_ALLOC_UNSUCESS",
+    "cause" : {
+        "type" : "nas", 
+        "value" : "deregister"
+    },
+    "crit_diag": {
+        "1": 10,
+        "2": "unsuccessfull-outcome",
+        "3": "notify",
+        "4": [
+            {
+                "criticality": "reject",
+                "id" : 100,
+                "error_type" : "not-understood"
+            }, 
+            {
+                "criticality": "ignore",
+                "id" : 65000,
+                "error_type" : "missing"
+            } 
+        ]
+    }
+}
+
