@@ -910,6 +910,11 @@ class N2Decoder2:
 
 class N2Decoder:
 
+
+    ADDR_V4V6 = 160
+    ADDR_V4   = 32
+    ADDR_V6   = 128
+
     def start_encode(self, **kwargs):
         """
         Encoder works based on arguments passed from the passed config files
@@ -1333,7 +1338,7 @@ class N2Decoder:
 
         if self.up_transport is not None:
             self.addr = self.up_transport["1"]
-            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"])
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"], self.up_transport["3"])
             IEs['dL-NGU-UP-TNLInformation'] = upTransport
         else:
             logger.error("Up Transport information is mandatory")
@@ -1508,7 +1513,7 @@ class N2Decoder:
 
         if self.up_transport is not None:
             self.addr = self.up_transport["1"]
-            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"])
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"], self.up_transport["3"])
             IEs['dL-NGU-UP-TNLInformation'] = upTransport
             #debugger.set_trace()
         else:
@@ -1517,7 +1522,7 @@ class N2Decoder:
 
         if self.dl_fwd_tunn_info is not None:
             self.addr = self.dl_fwd_tunn_info["1"]
-            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_fwd_tunn_info["2"])
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_fwd_tunn_info["2"], self.dl_fwd_tunn_info["3"])
             IEs['dLForwardingUP-TNLInformation'] = upTransport
             #debugger.set_trace()
 
@@ -1787,12 +1792,12 @@ class N2Decoder:
 
         if self.dl_tunn_info is not None:
             self.addr = self.dl_tunn_info["1"]
-            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_tunn_info["2"])
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_tunn_info["2"], self.dl_tunn_info["3"])
             IEs['dL-NGU-UP-TNLInformation'] = upTransport
 
         if self.dl_tunn_info is not None:
             self.addr = self.dl_tunn_info["1"]
-            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.ul_tunn_info["2"])
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.ul_tunn_info["2"], self.ul_tunn_info["3"])
             IEs['uL-NGU-UP-TNLInformation'] = upTransport
 
         if self.qos_flow_addmod is not None:
@@ -1801,8 +1806,9 @@ class N2Decoder:
         if self.addn_qos_tunn is not None:
             addr    = self.addn_qos_tunn["1"]
             teid    = self.addn_qos_tunn["2"]
-            qfi_lst = self.addn_qos_tunn["3"]
-            IEs['additionalQosFlowPerTNLInformation'] = self.encode_qosFlowPerTunnInfo(addr, teid, qfi_lst)
+            addrtype = self.addn_qos_tunn["3"]
+            qfi_lst = self.addn_qos_tunn["4"]
+            IEs['additionalQosFlowPerTNLInformation'] = self.encode_qosFlowPerTunnInfo(addr, addrtype, teid, qfi_lst)
 
         if self.qos_fail_addmod is not None:
             IEs['qosFlowFailedToAddOrModifyList'] = self.encode_QosList(self.qos_fail_addmod)
@@ -1838,11 +1844,13 @@ class N2Decoder:
 
             if 'dl_tunn_info' in item:
                 tmp_lst_tunn_info = item['dl_tunn_info']
-                tmp_dict['dLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], tmp_lst_tunn_info["2"])
+                tmp_dict['dLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], 
+                    tmp_lst_tunn_info["2"], tmp_lst_tunn_info["3"])
             
             if 'ul_tunn_info' in item:
                 tmp_lst_tunn_info = item['ul_tunn_info']
-                tmp_dict['uLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], tmp_lst_tunn_info["2"])
+                tmp_dict['uLForwardingUP-TNLInformation'] =  self.encode_UPTransportLayerInformation(tmp_lst_tunn_info["1"], 
+                    tmp_lst_tunn_info["2"], tmp_lst_tunn_info["3"] )
             
             tmp.append(tmp_dict)
 
@@ -1863,10 +1871,17 @@ class N2Decoder:
         return tmp
 
 
-    def encode_UPTransportLayerInformation(self, addr, teid):
+    def encode_UPTransportLayerInformation(self, addr, teid, addr_typ):
         "Return a tuple with Up Transport information"
         teid = unhexlify(teid)
-        return ('gTPTunnel', {'transportLayerAddress': (int(addr), 160), 'gTP-TEID': teid })
+        if addr_typ.lower() == "v4":
+            addrType = self.ADDR_V4
+        elif addr_typ.lower() == "v6":
+            addrType = self.ADDR_V6
+        else:
+            addrType = self.ADDR_V4V6
+        
+        return ('gTPTunnel', {'transportLayerAddress': (int(addr), addrType), 'gTP-TEID': teid })
 
 
     def encode_user_plane_sec_info(self, int_prot_result, conf_prot_result,
@@ -1982,7 +1997,7 @@ class N2Decoder:
         return tmp
 
 
-    def encode_qosFlowPerTunnInfo(self, addr, teid, qfi_list):
+    def encode_qosFlowPerTunnInfo(self, addr, addrtype, teid, qfi_list):
         """
         QosFlowPerTNLInformation ::= SEQUENCE {
             uPTransportLayerInformation		UPTransportLayerInformation,
@@ -1992,7 +2007,7 @@ class N2Decoder:
         }
         """
         temp = {}
-        temp['uPTransportLayerInformation'] = self.encode_UPTransportLayerInformation(addr, teid)
+        temp['uPTransportLayerInformation'] = self.encode_UPTransportLayerInformation(addr, teid, addrtype)
         temp['associatedQosFlowList'] = self.encode_associatedQfiList(qfi_list)
 
         return temp
