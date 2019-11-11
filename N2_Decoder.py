@@ -328,7 +328,7 @@ class N2Decoder2:
             ret = self.decode_PduSessionResourceModifyResponseTransfer(hex_ip) 
 
         elif msg_to_decode == 'PDU_SESS_RSRC_NOTF':
-            ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip) 
+            ret = self.decode_PduSessionResourceNotifyTransfer(hex_ip)
 
         elif msg_to_decode == 'PDU_SESS_RSRC_MOD_IND':
             ret = self.decode_PduSessionResourceModifyIndicationTransfer(hex_ip)
@@ -940,7 +940,9 @@ class N2Decoder:
         PDU_SESS_RSRC_SETUP_RSP
         PATH_SW_REQ
         HANDOVER_REQ_ACK
+        HANDOVER_REQUIRED
         HANDOVER_PREP_UNSUCESS
+        HANDOVER_RSRC_ALLOC_UNSUCESS
         """
         help_flag = 0
 
@@ -1002,6 +1004,13 @@ class N2Decoder:
                 ret = self.encode_HandoverResourceAllocUnsucessful(**kwargs)
             else:
                 print(self.encode_HandoverResourceAllocUnsucessful.__doc__)
+                return 0
+
+        elif msg_to_encode == 'PDU_SESS_RSRC_MOD_RSP':
+            if help_flag != 1:
+                ret = self.encode_PduSessionResourceModifyResponse(**kwargs)
+            else:
+                print(self.encode_PduSessionResourceModifyResponse.__doc__)
                 return 0
         else:
             logger.error(f"msg_type {msg_to_encode} is undefined")
@@ -1325,10 +1334,7 @@ class N2Decoder:
         if self.up_transport is not None:
             self.addr = self.up_transport["1"]
             upTransport = self.encode_UPTransportLayerInformation(self.addr, self.up_transport["2"])
-            #IEs = {'qosFlowPerTNLInformation': {'uPTransportLayerInformation': 
-            #        ('gTPTunnel', {'transportLayerAddress': (int(addr), 32), 'gTP-TEID': teid }), 'associatedQosFlowList': [{'qosFlowIdentifier': qfi}]}}
             IEs['dL-NGU-UP-TNLInformation'] = upTransport
-            #debugger.set_trace()
         else:
             logger.error("Up Transport information is mandatory")
             return 0
@@ -1718,6 +1724,106 @@ class N2Decoder:
             return ret
     
 
+    def encode_PduSessionResourceModifyResponse(self, **kwargs):
+        """
+        Pass values to encode handover PDU Session Resource Modify
+        Response Transfer and return a hex stream
+        PDU_SESS_RSRC_MOD_RSP
+        Keys/Args:
+
+        dl_tunn_info -  Dict is of type
+                    {"1": <address as bit string>, "2": <TEID without0x>}
+        ul_tunn_info -  Dict is of type
+                    {"1": <address as bit string>, "2": <TEID without0x>}
+        qos_flow_addmod : list of QFIs - [ 1, 2, 3...]
+        addn_qos_tunn : Dict of type
+                {"1": <address as bit string>, 
+                "2": <TEID without0x>
+                "3": <List of Dicts. Dict of Qfi and map indication>
+                    [{qfi: <QFI>, qfi_map_ind: <ul/dl.. this is optional>}]
+                }
+        qos_fail_addmod: Dict is of type
+            {"qfi": <>, "cause_type": <>, "cause_value": <>}
+                type is one of radioNetwork/transport/nas/protocol/misc
+                for value that can be used here,
+                    check ASN1 spec for below ENUMS
+                    CauseRadioNetwork,	CauseTransport, 
+                    CauseNas, CauseProtocol, CauseMisc}
+        """
+
+        self.debug              = kwargs['debug']            if 'debug'            in kwargs else None
+        self.dl_tunn_info       = kwargs['dl_tunn_info']     if 'dl_tunn_info'     in kwargs else None
+        self.ul_tunn_info       = kwargs['ul_tunn_info']     if 'ul_tunn_info'     in kwargs else None
+        self.qos_flow_addmod    = kwargs['qos_flow_addmod']  if 'qos_flow_addmod'  in kwargs else None
+        self.addn_qos_tunn      = kwargs['addn_qos_tunn']    if 'addn_qos_tunn'    in kwargs else None
+        self.qos_fail_addmod    = kwargs['qos_fail_addmod']  if 'qos_fail_addmod'  in kwargs else None
+
+        encodePduSessModResp = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
+
+        if self.debug ==  'true':
+            logger.debug(encodePduSessModResp._cont)
+            logger.debug(encodePduSessModResp.get_proto())
+        """
+        {
+        dL-NGU-UP-TNLInformation: <dL-NGU-UP-TNLInformation ([UPTransportLayerInformation] CHOICE)>,
+        uL-NGU-UP-TNLInformation: <uL-NGU-UP-TNLInformation ([UPTransportLayerInformation] CHOICE)>,
+        qosFlowAddOrModifyResponseList: <qosFlowAddOrModifyResponseList ([QosFlowAddOrModifyResponseList] SEQUENCE OF)>,
+        additionalQosFlowPerTNLInformation: <additionalQosFlowPerTNLInformation ([QosFlowPerTNLInformation] SEQUENCE)>, 
+        qosFlowFailedToAddOrModifyList: <qosFlowFailedToAddOrModifyList ([QosFlowList] SEQUENCE OF)>,
+        iE-Extensions: <iE-Extensions ([ProtocolExtensionContainer] SEQUENCE OF)>
+        }
+
+        PDUSessionResourceModifyResponseTransfer ::= SEQUENCE {
+            dL-NGU-UP-TNLInformation				UPTransportLayerInformation											OPTIONAL,
+            uL-NGU-UP-TNLInformation				UPTransportLayerInformation											OPTIONAL,
+            qosFlowAddOrModifyResponseList			QosFlowAddOrModifyResponseList										OPTIONAL,
+            additionalQosFlowPerTNLInformation		QosFlowPerTNLInformation											OPTIONAL,
+            qosFlowFailedToAddOrModifyList		QosFlowList																OPTIONAL,
+            iE-Extensions		ProtocolExtensionContainer { {PDUSessionResourceModifyResponseTransfer-ExtIEs} }	OPTIONAL,
+            ...
+        }
+        """
+        IEs = {} # let's build the list of IEs values
+
+        if self.dl_tunn_info is not None:
+            self.addr = self.dl_tunn_info["1"]
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.dl_tunn_info["2"])
+            IEs['dL-NGU-UP-TNLInformation'] = upTransport
+
+        if self.dl_tunn_info is not None:
+            self.addr = self.dl_tunn_info["1"]
+            upTransport = self.encode_UPTransportLayerInformation(self.addr, self.ul_tunn_info["2"])
+            IEs['uL-NGU-UP-TNLInformation'] = upTransport
+
+        if self.qos_flow_addmod is not None:
+            IEs['qosFlowAddOrModifyResponseList'] = self.encode_qosFlowAddOrModifyResponseList(self.qos_flow_addmod)
+
+        if self.addn_qos_tunn is not None:
+            addr    = self.addn_qos_tunn["1"]
+            teid    = self.addn_qos_tunn["2"]
+            qfi_lst = self.addn_qos_tunn["3"]
+            IEs['additionalQosFlowPerTNLInformation'] = self.encode_qosFlowPerTunnInfo(addr, teid, qfi_lst)
+
+        if self.qos_fail_addmod is not None:
+            IEs['qosFlowFailedToAddOrModifyList'] = self.encode_QosList(self.qos_fail_addmod)
+
+        try:
+            encodePduSessModResp.set_val(IEs)
+        except:
+            logger.exception("Error setting values for PDU Sess Modification Resp Transfer")
+            logger.debug(f"Array: {IEs}")
+            return 0
+
+        try:
+            ret = hexlify(encodePduSessModResp.to_aper())
+            if self.debug == 'true':
+                print(hexlify(encodePduSessModResp.to_aper()))
+
+        except:
+            logger.exception("Tried Encoding PDU Sess Modification Resp Transfer")
+        else:
+            return ret
+
 
 
     def encode_dataFwdDrbList(self, list_of_data_fwd_drb):
@@ -1868,11 +1974,52 @@ class N2Decoder:
         return IEs
 
 
-            #PDU_SESS_RSRC_MOD_RSP#
-            #PDU_SESS_RSRC_NOTF#
+    def encode_qosFlowAddOrModifyResponseList(self, qfi_list):
+        tmp = []
+        for qfi in qfi_list:
+            tmp.append({"qosFlowIdentifier": int(qfi)})
+
+        return tmp
+
+
+    def encode_qosFlowPerTunnInfo(self, addr, teid, qfi_list):
+        """
+        QosFlowPerTNLInformation ::= SEQUENCE {
+            uPTransportLayerInformation		UPTransportLayerInformation,
+            associatedQosFlowList			AssociatedQosFlowList,
+            iE-Extensions		ProtocolExtensionContainer { { QosFlowPerTNLInformation-ExtIEs} }	OPTIONAL,
+            ...
+        }
+        """
+        temp = {}
+        temp['uPTransportLayerInformation'] = self.encode_UPTransportLayerInformation(addr, teid)
+        temp['associatedQosFlowList'] = self.encode_associatedQfiList(qfi_list)
+
+        return temp
+        
+
+    def encode_associatedQfiList(self, assoc_qfi_list):
+        """
+        AssociatedQosFlowItem ::= SEQUENCE {
+            qosFlowIdentifier				QosFlowIdentifier,
+            qosFlowMappingIndication		ENUMERATED {ul, dl, ...}							OPTIONAL,
+            iE-Extensions		ProtocolExtensionContainer { {AssociatedQosFlowItem-ExtIEs} }	OPTIONAL,
+            ...
+        }
+        """
+        tmpLst = []
+        for item in assoc_qfi_list:
+            tmp_dict = {}
+            tmp_dict['qosFlowIdentifier'] = item['qfi']
+            if 'qfi_map_ind' in item:
+                tmp_dict['qosFlowMappingIndication'] = item['qfi_map_ind']
+            tmpLst.append(tmp_dict)
+
+        return tmpLst
+
+
+
             #PDU_SESS_RSRC_MOD_IND#
-            #HANDOVER_REQ_ACK#
-            #PDU_SESS_RSRC_REL_RESP#
 
 if __name__ ==  "__main__" :
     logger = logging.getLogger(__name__)
@@ -1910,4 +2057,6 @@ if __name__ ==  "__main__" :
     #n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
     #n2DecodeObj.encode_HandoverPreparationUnsuccessfulTransfer(debug='true')
     #n2DecodeObj.encode_HandoverRequiredTransfer(debug= 'true')
-    n2DecodeObj.encode_HandoverResourceAllocUnsucessful(debug='true')
+    #n2DecodeObj.encode_HandoverResourceAllocUnsucessful(debug='true')
+    n2DecodeObj.encode_PduSessionResourceModifyResponse(debug='true')
+    
