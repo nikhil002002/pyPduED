@@ -3,7 +3,8 @@ import re
 import pdb as debugger
 import logging
 import NGAP_DEC
-from pycrate_asn1dir import RRC3G
+import NGAP_MAR
+#from pycrate_asn1dir import RRC3G
 from pycrate_asn1rt import utils
 
 #00000400820008081e8480203d09000086000100008b001a09f0114610103ffe0000000000000000000011461010400101050088000700050000052000
@@ -278,6 +279,10 @@ class N2Decoder2:
         Decoder works based on a Hex string passed from the cmd Line
 
         Usage: N2_Encode_Decode.py decode -i sample_config.json
+            Input file is a json key value pair of
+                msg_type : <one of the below supported values. mandatory>
+                hex      : <Hex to decode. Mandatory>
+                spec_version : 'Dec' or 'Mar'. Optional. Defaults to Dec
 
         Supported message types:
             PDU_SESS_RSRC_SETUP_REQ
@@ -311,6 +316,12 @@ class N2Decoder2:
                 a hex value. You need to pass the hex and type of message you want to decode")
             return
 
+        self.SPEC_VERSION = 'Dec'
+
+        if 'spec_version' in kwargs:
+            if kwargs['spec_version'] in ['Dec', 'Mar']:
+                self.SPEC_VERSION = kwargs['spec_version'] 
+
         #########################
         logger.info(f"Starting Decode of {hex_ip} Message To Decode {msg_to_decode}")
         #########################
@@ -338,10 +349,10 @@ class N2Decoder2:
 
         elif msg_to_decode == 'PATH_SW_REQ':
             ret = self.decode_PathSwitchRequestTransfer(hex_ip)
-        
+
         elif msg_to_decode == 'PATH_SW_REQ_ACK':
             ret = self.decode_PathSwitchRequestAcknowledgeTransfer(hex_ip)
-        
+
         elif msg_to_decode == 'HANDOVER_CMD':
             ret = self.decode_HandoverCommandTransfer(hex_ip)
 
@@ -390,7 +401,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceSetupRequestTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -412,7 +426,10 @@ class N2Decoder2:
 
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceSetupResponseTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -438,7 +455,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceModifyRequestTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -463,7 +483,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -488,7 +511,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceNotifyTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -513,7 +539,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyIndicationTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyIndicationTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceModifyIndicationTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -539,7 +568,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyConfirmTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyConfirmTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceModifyConfirmTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -562,7 +594,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PathSwitchRequestTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -586,7 +621,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestAcknowledgeTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestAcknowledgeTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PathSwitchRequestAcknowledgeTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -609,7 +647,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverCommandTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.HandoverCommandTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.HandoverCommandTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -632,7 +673,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequestAcknowledgeTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.HandoverRequestAcknowledgeTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -655,7 +699,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseCommandTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseCommandTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceReleaseCommandTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -681,7 +728,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyReleasedTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceNotifyReleasedTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceNotifyReleasedTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -706,7 +756,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.HandoverRequiredTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.HandoverRequiredTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -730,7 +783,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PathSwitchRequestSetupFailedTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -755,7 +811,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceSetupUnsuccessfulTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -781,7 +840,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceModifyUnsuccessfulTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -807,7 +869,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.HandoverPreparationUnsuccessfulTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -834,7 +899,10 @@ class N2Decoder2:
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.HandoverResourceAllocationUnsuccessfulTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -855,11 +923,14 @@ class N2Decoder2:
 
     def decode_PathSwitchRequestUnsuccessfulTransfer(self, hexString, **kwargs):
         """
-        Decoder for Path Switch Request Unsuccessful Transfer 
+        Decoder for Path Switch Request Unsuccessful Transfer
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestUnsuccessfulTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PathSwitchRequestUnsuccessfulTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PathSwitchRequestUnsuccessfulTransfer
         if debug == "true":
             logger.debug(decode_obj)
 
@@ -881,11 +952,14 @@ class N2Decoder2:
 
     def decode_PDUSessionResourceReleaseResponseTransfer(self, hexString, **kwargs):
         """
-        Decoder for PDU Session Resource Release Response Transfer 
+        Decoder for PDU Session Resource Release Response Transfer
         """
         debug = kwargs['debug']    if 'debug'     in kwargs else None
 
-        decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
+        if self.SPEC_VERSION == 'Dec':
+            decode_obj = NGAP_DEC.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
+        elif self.SPEC_VERSION == 'Mar':
+            decode_obj = NGAP_MAR.NGAP_IEs.PDUSessionResourceReleaseResponseTransfer
         if debug == "true":
             logger.debug(decode_obj)
 

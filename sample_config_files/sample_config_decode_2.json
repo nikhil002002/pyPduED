@@ -1,4 +1,5 @@
 {
     "msg_type" : "PDU_SESS_RSRC_SETUP_RSP",
-    "hex" : "0003e006070901100000010005" 
+    "hex" : "0003e006070901100000010005",
+    "spec_version" : "Mar" 
 }

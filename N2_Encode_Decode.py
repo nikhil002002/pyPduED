@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
-import sys, getopt
+import sys
+import getopt
 import re
-import pdb as debugger
-import N2_Decoder
 import logging
 import json
+#import pdb as debugger
+import N2_Decoder
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-s_handler = logging.StreamHandler(sys.stdout)
-s_handler.setLevel(logging.INFO)
-logger.addHandler(s_handler)
 
 def print_help(opr_typ):
     """
@@ -20,7 +18,7 @@ def print_help(opr_typ):
     print("The Command can be used as N2_Encode_Decode <opr> [-i|--inputFile]")
     print("<opr> can be encode or decode")
     print("-i|--inputFile is the json file that contain the various opts in Json format")
-    print("Use --debug to print logs to /tmp/N2_encode_decode")
+    print("Use --debug=<path> to print logs file N2_encode_decode in <path> e.g. --debug=/tmp/")
 
     if opr_typ == "encode":
         print(N2_Decoder.N2Decoder.start_encode.__doc__)
@@ -75,7 +73,7 @@ def main_function():
         sys.exit()
 
     try:
-        opts, args = getopt.getopt(sys.argv[2:], 'i:', ["help", "inputFile=", "debug"])
+        opts, args = getopt.getopt(sys.argv[2:], 'i:', ["help", "inputFile=", "debug="])
     except getopt.GetoptError:
         print("Incorrect usage. Check help using --help")
         sys.exit()
@@ -86,14 +84,26 @@ def main_function():
             sys.exit()
         if opt == '--debug':
             debugging_enabled = 1
-            # Create file handlers
-            f_handler = logging.FileHandler('/tmp/n2EncoderDecoder.log', 'w')
-            f_handler.setLevel(logging.DEBUG)
-            # Create formatters and add it to handlers
-            f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            f_handler.setFormatter(f_format)
-            # Add handlers to the logger
-            logger.addHandler(f_handler)
+            debug_file_loc = val + 'n2EncoderDecoder.log'
+
+            try:
+                f_handler = logging.FileHandler(debug_file_loc, 'w')
+            except Exception:
+                logger.exception("Exception in creating logfile")
+                sys.exit()
+            else:
+                # Create file handlers
+                f_handler.setLevel(logging.DEBUG)
+                # Create formatters and add it to handlers
+                f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                f_handler.setFormatter(f_format)
+                # Add handlers to the logger
+                logger.addHandler(f_handler)
+        else:
+            s_handler = logging.StreamHandler(sys.stdout)
+            s_handler.setLevel(logging.INFO)
+            logger.addHandler(s_handler)
+
 
 
     if sys.argv[1] == 'encode':
