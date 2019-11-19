@@ -110,6 +110,10 @@ def main_function():
         for opt, val in opts:
             if "-i" in opt or "--inputFile" in opt:
                 n2_encoder_invoke(val, debugging_enabled)
+
+                logger.info("Hi THis is twst")
+                logger.debug("test")
+
                 sys.exit()
         print("Check Help. you need to pass a file with input parameters")
 

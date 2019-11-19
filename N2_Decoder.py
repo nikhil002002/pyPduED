@@ -1839,6 +1839,7 @@ class N2Decoder:
 
         encodePduSessModResp = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
 
+        logger.info("Hi THis is twst")
         if self.debug ==  'true':
             logger.debug(encodePduSessModResp._cont)
             logger.debug(encodePduSessModResp.get_proto())
@@ -2110,18 +2111,18 @@ class N2Decoder:
 
             #PDU_SESS_RSRC_MOD_IND#
 
-if __name__ ==  "__main__" :
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    s_handler = logging.StreamHandler(sys.stdout)
-    s_handler.setLevel(logging.DEBUG)
-    logger.addHandler(s_handler) 
+#if __name__ ==  "__main__" :
+    #logger = logging.getLogger(__name__)
+    #logger.setLevel(logging.DEBUG)
+    #s_handler = logging.StreamHandler(sys.stdout)
+    #s_handler.setLevel(logging.DEBUG)
+    #logger.addHandler(s_handler) 
     #test()
     #testPcch()
     #encode_PduSessionResourceSetupRequestTransfer_2()
 
     #Dummy call
-    n2Obj = N2Decoder()
+    ####n2Obj = N2Decoder()
     #decoded_bytes = n2Obj.encode_PduSessionResourceSetupRequestTransfer( ambr = (6000000,6000000), 
     #    pdu_typ = 'ipv4', qfi = [('5', '5', '9', 'shall-not-trigger-pre-emption', 'not-pre-emptable')],
     #    gtp_tunn = ('98615294594055401567350253808623404875904323600', '40010105') )
@@ -2141,11 +2142,10 @@ if __name__ ==  "__main__" :
     #n2Obj.encode_PduSessionResourceSetupResponseTransfer( qos_per_tunn = ( '101124353', '10000001', 5 ), sec_result = ('performed','performed'), qos_failed_lst = [('5', 'deregister'), ('6', 'normal-release')])
     #3003e00607090110000001000500102a406400
 
-    n2DecodeObj =N2Decoder()
+    #n2DecodeObj =N2Decoder()
     #n2DecodeObj.encode_PathSwithRequestTransfer(debug = 'true')
     #n2DecodeObj.encode_HandoverReqAckTransfer(debug= 'true')
     #n2DecodeObj.encode_HandoverPreparationUnsuccessfulTransfer(debug='true')
     #n2DecodeObj.encode_HandoverRequiredTransfer(debug= 'true')
     #n2DecodeObj.encode_HandoverResourceAllocUnsucessful(debug='true')
-    n2DecodeObj.encode_PduSessionResourceModifyResponse(debug='true')
-    
+    #n2DecodeObj.encode_PduSessionResourceModifyResponse(debug='true')
