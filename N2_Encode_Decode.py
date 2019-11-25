@@ -8,8 +8,10 @@ import json
 #import pdb as debugger
 import N2_Decoder
 
+logging.root.setLevel(logging.DEBUG)
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 def print_help(opr_typ):
     """
@@ -98,11 +100,11 @@ def main_function():
                 f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
                 f_handler.setFormatter(f_format)
                 # Add handlers to the logger
-                logger.addHandler(f_handler)
+                logging.root.addHandler(f_handler)
         else:
             s_handler = logging.StreamHandler(sys.stdout)
             s_handler.setLevel(logging.INFO)
-            logger.addHandler(s_handler)
+            logging.root.addHandler(s_handler)
 
 
 
@@ -111,8 +113,8 @@ def main_function():
             if "-i" in opt or "--inputFile" in opt:
                 n2_encoder_invoke(val, debugging_enabled)
 
-                logger.info("Hi THis is twst")
-                logger.debug("test")
+                #logger.info("Hi THis is twst")
+                #logger.debug("test")
 
                 sys.exit()
         print("Check Help. you need to pass a file with input parameters")

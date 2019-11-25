@@ -1024,7 +1024,8 @@ class N2Decoder:
         HANDOVER_RSRC_ALLOC_UNSUCESS
         """
         help_flag = 0
-
+        #logger.info("In N2")
+        #logger.debug("In N2 test test")
         #Check if msg type is present
         if 'msg_type' in kwargs:
             msg_to_encode = kwargs['msg_type']
@@ -1839,7 +1840,7 @@ class N2Decoder:
 
         encodePduSessModResp = NGAP_DEC.NGAP_IEs.PDUSessionResourceModifyResponseTransfer
 
-        logger.info("Hi THis is twst")
+        #logger.info("Hi THis is twst")
         if self.debug ==  'true':
             logger.debug(encodePduSessModResp._cont)
             logger.debug(encodePduSessModResp.get_proto())
