@@ -69,7 +69,6 @@ def main_function():
 
     debugging_enabled = 0
 
-    #validate Input is only Hex
     if len(sys.argv) < 2:
         print("Script needs atleast one argument encode or decode. To view help for each,")
         print("N2_Encode_Decode encode --help")
