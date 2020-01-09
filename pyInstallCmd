@@ -1,2 +1,4 @@
 #Linux
 pyinstaller --distpath ./lin/dist --workpath ./lin/build -F --specpath ./lin/spec --paths /nirajend/SW/pycrate --key <> N2_Encode_Decode.py
+fpm -s dir -t rpm -n "N2_Encode_Decode" -v 1.0 --prefix /tmp N2_Encode_Decode
+ fpm -s dir -t rpm -n "N2_Encode_Decode" -v 1.1 --prefix /opt/N2_Encode_Decode/bin N2_Encode_Decode

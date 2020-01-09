@@ -383,6 +383,9 @@ class N2Decoder2:
         elif msg_to_decode == 'HANDOVER_RSRC_ALLOC_UNSUCESS':
             ret = self.decode_HandoverResourceAllocationUnsuccessfulTransfer(hex_ip)
 
+        elif msg_to_decode == 'PATH_SW_REQ_UNSUCESS':
+            ret = self.decode_PathSwitchRequestUnsuccessfulTransfer(hex_ip)
+
         elif msg_to_decode == 'PDU_SESS_RSRC_REL_RESP':
             ret = self.decode_PDUSessionResourceReleaseResponseTransfer(hex_ip)
 
@@ -1022,6 +1025,7 @@ class N2Decoder:
         HANDOVER_REQUIRED
         HANDOVER_PREP_UNSUCESS
         HANDOVER_RSRC_ALLOC_UNSUCESS
+        PDU_SESS_RSRC_MOD_RSP
         """
         help_flag = 0
         #logger.info("In N2")

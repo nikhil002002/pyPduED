@@ -71,7 +71,10 @@ def main_function():
 
     #validate Input is only Hex
     if len(sys.argv) < 2:
-        print("Script needs atleast one argument encode/decode")
+        print("Script needs atleast one argument encode or decode. To view help for each,")
+        print("N2_Encode_Decode encode --help")
+        print("or")
+        print("N2_Encode_Decode decode --help")
         sys.exit()
 
     try:
@@ -117,14 +120,14 @@ def main_function():
                 #logger.debug("test")
 
                 sys.exit()
-        print("Check Help. you need to pass a file with input parameters")
+        print("Check Help for encode. you need to pass a file with input parameters")
 
     elif sys.argv[1] == 'decode':
         for opt, val in opts:
             if "-i" in opt or "--inputFile" in opt:
                 n2_decoder_invoke(val, debugging_enabled)
                 sys.exit()
-        print("Check Help. you need to pass a fil with hex string to decode")
+        print("Check Help for decode. you need to pass a field with hex string to decode")
 
 
 
